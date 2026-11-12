@@ -20,7 +20,7 @@ public abstract class EspBase extends Module {
    protected final NumberSetting maxObjects = this.add(new NumberSetting("Max Objekte", 512.0, 4.0, 512.0, 4.0));
    protected final NumberSetting thickness = this.add(new NumberSetting("Linienstaerke", 4.0, 1.0, 4.0, 1.0));
    protected final NumberSetting opacity = this.add(new NumberSetting("Transparenz", 1.0, 0.2, 1.0, 0.05));
-   protected final BoolSetting smoothing = this.add(new BoolSetting("Linien-Antialiasing", false));
+   protected final BoolSetting smoothing = this.add(new BoolSetting("Linien-Antialiasing", true));
    protected final BoolSetting distanceFade = this.add(new BoolSetting("Distanz-Fade", false));
    protected final NumberSetting fadeStart = this.add(new NumberSetting("Fade ab (Anteil)", 0.9, 0.1, 0.9, 0.05));
    protected final ModeSetting style = this.add(new ModeSetting("Box", "3D", "3D", "2D", "Aus"));
@@ -62,8 +62,10 @@ public abstract class EspBase extends Module {
             double cz = (box.field_1321 + box.field_1324) / 2.0;
             double fade = 1.0;
             if (this.distanceFade.get() && mc.field_1724 != null && this.range.get() > 0.0) {
-               double distanceToTarget = new class_243(mc.field_1724.method_23317(), mc.field_1724.method_23318(), mc.field_1724.method_23321())
-                  .method_1022(new class_243(cx, cy, cz));
+               double dx = cx - Projection.eyeX();
+               double dy = cy - Projection.eyeY();
+               double dz = cz - Projection.eyeZ();
+               double distanceToTarget = Math.sqrt(dx * dx + dy * dy + dz * dz);
                double start = this.fadeStart.get();
                double progress = (distanceToTarget / this.range.get() - start) / Math.max(0.01, 1.0 - start);
                fade = Math.max(0.0, Math.min(1.0, 1.0 - progress));
