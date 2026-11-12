@@ -59,9 +59,7 @@ public abstract class EntityScanEsp extends EspBase {
                lb = lb + " " + Math.round(le.method_6032()) + "hp";
             }
 
-            class_243 renderedPos = ex.method_30950(Projection.tickDelta());
-            class_238 renderedBox = ex.method_5829()
-               .method_989(renderedPos.field_1352 - ex.method_23317(), renderedPos.field_1351 - ex.method_23318(), renderedPos.field_1350 - ex.method_23321());
+            class_238 renderedBox = Projection.interpolatedBoundingBox(ex);
             this.drawTarget(ctx, renderedBox, lb, this.color.rgb());
          }
       }
