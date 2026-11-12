@@ -6,6 +6,7 @@
     "HeldItemRendererMixin",
     "CameraMixin",
     "GameRendererAccessor",
+    "CameraProjectionAccessor",
     "AbstractSignEditScreenMixin",
     "SlowSwingMixin",
     "SeedCrackerProgressMixin",
