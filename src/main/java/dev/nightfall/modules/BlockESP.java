@@ -24,7 +24,7 @@ public final class BlockESP extends Module {
    private final BoolSetting obsidian = this.add(new BoolSetting("Obsidian", false));
    private final BoolSetting gold = this.add(new BoolSetting("Golderz", false));
    private final BoolSetting emerald = this.add(new BoolSetting("Smaragderz", false));
-   private final List<class_2338> found = new ArrayList<>();
+   private final List<class_238> found = new ArrayList<>();
    private int timer;
 
    public BlockESP() {
@@ -69,7 +69,7 @@ public final class BlockESP extends Module {
                         for (int y = minY; y <= maxY && this.found.size() < cap; y++) {
                            class_2338 bp = new class_2338(x, y, z);
                            if (this.selected(mc.field_1687.method_8320(bp).method_26204())) {
-                              this.found.add(bp.method_10062());
+                              this.found.add(new class_238(bp));
                            }
                         }
                      }
@@ -83,8 +83,8 @@ public final class BlockESP extends Module {
    @Override
    public void renderHud(class_332 ctx) {
       if (Projection.valid()) {
-         for (class_2338 p : this.found) {
-            Draw.box(ctx, new class_238(p), -576035329, 1, true);
+         for (class_238 box : this.found) {
+            Draw.box(ctx, box, -576035329, 1, true);
          }
       }
    }
