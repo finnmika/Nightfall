@@ -33,9 +33,9 @@ public final class JumpCircles extends Module {
             this.airborne = true;
          } else if (this.airborne) {
             this.airborne = false;
-            String i = this.style.get();
+            String styleName = this.style.get();
 
-            class_2394 p = switch (i) {
+            class_2394 p = switch (styleName) {
                case "Enchant" -> class_2398.field_11215;
                case "Soul" -> class_2398.field_23114;
                case "Flamme" -> class_2398.field_11240;
@@ -43,8 +43,8 @@ public final class JumpCircles extends Module {
                default -> class_2398.field_11204;
             };
 
-            for (int i = 0; i < 18; i++) {
-               double angle = (Math.PI * 2) * i / 18.0;
+            for (int particleIndex = 0; particleIndex < 18; particleIndex++) {
+               double angle = (Math.PI * 2) * particleIndex / 18.0;
                double x = mc.field_1724.method_23317() + Math.cos(angle) * this.radius.get();
                double z = mc.field_1724.method_23321() + Math.sin(angle) * this.radius.get();
                mc.field_1713.method_3056(p, x, mc.field_1724.method_23318() + 0.08, z, Math.cos(angle) * 0.025, 0.025, Math.sin(angle) * 0.025);
