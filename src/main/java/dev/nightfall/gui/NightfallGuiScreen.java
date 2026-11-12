@@ -733,7 +733,7 @@ public final class NightfallGuiScreen extends class_437 {
          ? 0
          : Math.max(0, Math.min(availableBody, tab.equals("Config") ? 470 : Math.max(82, visible + 34)));
       this.panel(ctx, x, y, w, 25 + bodyH);
-      roundedRect(ctx, x, y, w, 25, Config.cornerRadius, -300937959);
+      roundedRect(ctx, x, y, w, 25, Config.cornerRadius, Theme.withAlpha(-300937959, Math.max(0, (100 - Config.guiTransparency) * 255 / 100)));
       roundedRect(ctx, x, y, Math.max(2, Config.borderSize), 25, 2, Theme.ACCENT);
       ctx.method_51433(mc.field_1772, icon(tab) + "  " + tab, x + 10, y + 9, Theme.TEXT, true);
       if (click && inside(mx, my, x, y, w, 25)) {
@@ -1050,9 +1050,9 @@ public final class NightfallGuiScreen extends class_437 {
          Theme.ACCENT,
          false
       );
-      this.drawConfigSlider(ctx, mc, "Transparenz", Config.guiTransparency + "%", "transparency", x + 10, y + 262, w - 20, (Config.guiTransparency - 35) / 65.0F);
+      this.drawConfigSlider(ctx, mc, "Transparenz", Config.guiTransparency + "%", "transparency", x + 10, y + 262, w - 20, Config.guiTransparency / 100.0F);
       this.drawConfigSlider(ctx, mc, "Randgröße", Config.borderSize + " px", "border", x + 10, y + 300, w - 20, (Config.borderSize - 1) / 5.0F);
-      this.drawConfigSlider(ctx, mc, "Rundungen", Config.cornerRadius + " px", "radius", x + 10, y + 338, w - 20, (Config.cornerRadius - 4) / 18.0F);
+      this.drawConfigSlider(ctx, mc, "Rundungen", Config.cornerRadius + " px", "radius", x + 10, y + 338, w - 20, (Config.cornerRadius - 10) / 22.0F);
       this.drawConfigSlider(ctx, mc, "Menügröße", Config.guiScalePercent + "%", "scale", x + 10, y + 376, w - 20, (Config.guiScalePercent - 70) / 30.0F);
       this.drawConfigSlider(ctx, mc, "Randabstand", Config.guiEdgeMargin + " px", "margin", x + 10, y + 414, w - 20, Config.guiEdgeMargin / 60.0F);
       if (click && inside(mx, my, x + 10, y + 202, w - 20, 12)) {
@@ -1125,9 +1125,9 @@ public final class NightfallGuiScreen extends class_437 {
       switch (this.slider) {
          case "hue" -> { Config.accentHue = t * 360.0F; this.applyHue(); }
          case "blur" -> Config.blurStrength = Math.round(t * 150.0F);
-         case "transparency" -> Config.guiTransparency = 35 + Math.round(t * 65);
+         case "transparency" -> Config.guiTransparency = Math.round(t * 100);
          case "border" -> Config.borderSize = 1 + Math.round(t * 5);
-         case "radius" -> Config.cornerRadius = 4 + Math.round(t * 18);
+         case "radius" -> Config.cornerRadius = 10 + Math.round(t * 22);
          case "scale" -> Config.guiScalePercent = 70 + Math.round(t * 30);
          case "margin" -> Config.guiEdgeMargin = Math.round(t * 60);
       }
@@ -1175,10 +1175,21 @@ public final class NightfallGuiScreen extends class_437 {
 
    private void panel(class_332 c, int x, int y, int w, int h) {
       int border = Math.max(1, Math.min(6, Config.borderSize));
-      int radius = Math.max(4, Math.min(22, Config.cornerRadius));
-      int alpha = Math.max(35, Math.min(100, Config.guiTransparency)) * 255 / 100;
-      roundedRect(c, x - border, y - border, w + border * 2, h + border * 2, radius + border, Theme.withAlpha(Theme.ACCENT, 185));
-      roundedRect(c, x, y, w, h, radius, Theme.withAlpha(-653587951, alpha));
+      int radius = Math.max(10, Math.min(32, Config.cornerRadius));
+      int transparency = Math.max(0, Math.min(100, Config.guiTransparency));
+      int fillAlpha = (100 - transparency) * 255 / 100;
+      int edgeAlpha = Math.max(95, Math.min(190, 175 - transparency / 3));
+
+      // Soft shadow + luminous accent rim create the rounded "bubble" silhouette.
+      roundedRect(c, x - border - 3, y - border - 2, w + border * 2 + 6, h + border * 2 + 5,
+         radius + border + 3, Theme.withAlpha(0xFF000000, 48));
+      roundedRect(c, x - border, y - border, w + border * 2, h + border * 2,
+         radius + border, Theme.withAlpha(Theme.ACCENT, edgeAlpha));
+
+      // The slider controls opacity, not brightness: higher transparency reveals more of the game.
+      if (fillAlpha > 0) {
+         roundedRect(c, x, y, w, h, radius, Theme.withAlpha(0xFF0B0A11, fillAlpha));
+      }
    }
 
    private static void roundedRect(class_332 c, int x, int y, int w, int h, int radius, int color) {
