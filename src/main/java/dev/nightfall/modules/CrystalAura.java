@@ -86,18 +86,20 @@ public class CrystalAura extends Module {
       return null;
    }
 
-   private void placeObsidianAfterHit(class_746 player, class_1657 target) {
-      if (!this.placeObsidianOnHit.get()) return;
+   private boolean placeObsidianAfterHit(class_746 player, class_1657 target) {
+      if (!this.placeObsidianOnHit.get()) return false;
       class_2338 base = findHitObsidianBase(player, target);
-      if (base == null) return;
+      if (base == null) return false;
+      if (mc.field_1687.method_8320(base).method_27852(class_2246.field_9987)) return true;
       int slot = InvUtil.ensureHotbar(class_1802.field_8281);
-      if (slot < 0) return;
+      if (slot < 0) return false;
       class_2338 support = base.method_10074();
       InvUtil.select(slot);
       class_243 hit = class_243.method_24953(support).method_1031(0.5, 1.0, 0.5);
       mc.field_1761.method_2896(player, class_1268.field_5808,
          new class_3965(hit, class_2350.field_11036, support, false));
       player.method_6104(class_1268.field_5808);
+      return true;
    }
 
    @Override
@@ -149,7 +151,10 @@ public class CrystalAura extends Module {
                   boolean targetWasHit = !Float.isNaN(this.lastTargetHealth)
                      && currentHealth < this.lastTargetHealth - 0.01F;
                   this.lastTargetHealth = currentHealth;
-                  if (targetWasHit) this.placeObsidianAfterHit(p, target);
+                  if (targetWasHit) {
+                     // On every confirmed hit, place obsidian first. Crystal placement continues on the following tick.
+                     if (this.placeObsidianAfterHit(p, target)) return;
+                  }
                }
             }
             if (target != null && !target.method_24828()) {
