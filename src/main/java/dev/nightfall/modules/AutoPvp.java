@@ -457,6 +457,7 @@ public class AutoPvp extends Module {
          class_1657 target = CombatUtil.nearestPlayer(this.follow.get());
          if (target == null) {
             this.clearDoubleTap();
+            this.resetCrystalCombo();
             this.cancelSlam(true);
             this.releaseShieldAxe();
             this.release();
