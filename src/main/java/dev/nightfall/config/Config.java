@@ -33,7 +33,9 @@ public final class Config {
    public static int blurStrength = 72;
    public static int guiTransparency = 82;
    public static int borderSize = 2;
-   public static int cornerRadius = 14;
+   public static int cornerRadius = 18;
+   public static int guiScalePercent = 100;
+   public static int guiEdgeMargin = 12;
    public static String categoryOrder = "Combat,Movement,Visuals,Player,World,Misc,HUD,Config";
    public static boolean guiAnimations = true;
    public static float guiAnimationSpeed = 1.0F;
@@ -66,6 +68,8 @@ public final class Config {
          root.addProperty("guiTransparency", guiTransparency);
          root.addProperty("borderSize", borderSize);
          root.addProperty("cornerRadius", cornerRadius);
+         root.addProperty("guiScalePercent", guiScalePercent);
+         root.addProperty("guiEdgeMargin", guiEdgeMargin);
          root.addProperty("categoryOrder", categoryOrder);
          root.addProperty("guiAnimations", guiAnimations);
          root.addProperty("guiAnimationSpeed", guiAnimationSpeed);
@@ -178,6 +182,12 @@ public final class Config {
             }
             if (root.has("cornerRadius")) {
                cornerRadius = Math.max(4, Math.min(22, root.get("cornerRadius").getAsInt()));
+            }
+            if (root.has("guiScalePercent")) {
+               guiScalePercent = Math.max(70, Math.min(100, root.get("guiScalePercent").getAsInt()));
+            }
+            if (root.has("guiEdgeMargin")) {
+               guiEdgeMargin = Math.max(0, Math.min(60, root.get("guiEdgeMargin").getAsInt()));
             }
             if (root.has("categoryOrder")) {
                categoryOrder = root.get("categoryOrder").getAsString();
