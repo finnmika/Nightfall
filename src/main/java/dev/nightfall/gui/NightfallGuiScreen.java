@@ -609,7 +609,6 @@ public final class NightfallGuiScreen extends class_437 {
          }
       }
 
-      ctx.method_51433(mc.field_1772, "+", sw / 2 - 4, sh / 2 - 5, Theme.ACCENT, true);
 
       if (this.numberSlider != null) {
          float amount = Math.max(0.0F, Math.min(1.0F, (float)(mx - this.numberSliderX) / Math.max(1, this.numberSliderW)));
