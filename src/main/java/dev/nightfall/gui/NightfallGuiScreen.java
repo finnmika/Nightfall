@@ -572,6 +572,7 @@ public final class NightfallGuiScreen extends class_437 {
          if (click && over) {
             this.activeTab = tab;
             this.tabChangedAt = System.nanoTime();
+            click = false;
          }
       }
 
@@ -641,9 +642,13 @@ public final class NightfallGuiScreen extends class_437 {
          visible += 22 + (expanded.contains(m.getName()) ? m.getSettings().size() * 22 : 0);
       }
 
+      int availableBody = Math.max(64, this.field_22790 - y - 25 - 12);
+      if (this.field_22789 >= 720 && this.field_22790 >= 400) {
+         availableBody = Math.min(availableBody, Math.max(82, this.field_22790 / 2 - 48));
+      }
       int bodyH = this.pMinimized(tab)
          ? 0
-         : Math.max(0, Math.min(Math.max(64, this.field_22790 - y - 25 - 12), tab.equals("Config") ? 340 : Math.max(82, visible + 34)));
+         : Math.max(0, Math.min(availableBody, tab.equals("Config") ? 340 : Math.max(82, visible + 34)));
       this.panel(ctx, x, y, w, 25 + bodyH);
       ctx.method_25294(x, y, x + w, y + 25, -300937959);
       ctx.method_25294(x, y, x + 2, y + 25, Theme.ACCENT);
