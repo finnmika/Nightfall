@@ -76,7 +76,8 @@ public final class NightfallGuiScreen extends class_437 {
       restoreTabs();
 
       for (String tab : TABS) {
-         this.panel(tab, 188, 105)[2] = tab.equals(this.activeTab) ? 1 : 0;
+         this.panel(tab, 188, 105)[2] = tab.equals(this.activeTab)
+            || tab.equals("Visuals") || tab.equals("Player") || tab.equals("HUD") ? 1 : 0;
       }
    }
 
@@ -319,6 +320,9 @@ public final class NightfallGuiScreen extends class_437 {
       boolean rightClick = right && !this.prevRight;
       this.prevLeft = left;
       this.prevRight = right;
+      if (this.drawPremiumLayout(ctx, mx, my, click, release, rightClick, left, mc)) {
+         return;
+      }
       if (click && inside(mx, my, 12, 10, 164, 78)) {
          long now = System.currentTimeMillis();
          if (now - this.lastNinoSecretClick > 1200L) {
@@ -516,6 +520,107 @@ public final class NightfallGuiScreen extends class_437 {
          Theme.TEXT_DIM,
          false
       );
+   }
+
+   private boolean drawPremiumLayout(class_332 ctx, int mx, int my, boolean click, boolean release, boolean rightClick, boolean left, class_310 mc) {
+      if (this.field_22789 < 720 || this.field_22790 < 400) {
+         return false;
+      }
+
+      int sw = this.field_22789;
+      int sh = this.field_22790;
+      int side = Math.max(126, Math.min(150, sw / 6));
+      int x1 = side + 18;
+      int gap = 12;
+      int panelW = Math.min(310, (sw - x1 - 30 - gap) / 2);
+      int x2 = x1 + panelW + gap;
+      int topY = 72;
+      int bottomY = Math.max(220, sh / 2 + 8);
+      int headerH = 54;
+
+      ctx.method_25294(0, 0, sw, sh, -1459091184);
+      int shade = Math.max(0, Math.min(150, Config.blurStrength));
+      ctx.method_25294(0, 0, sw, sh, shade << 24 | 526095);
+      ctx.method_25294(0, 0, sw, 3, Theme.ACCENT);
+
+      this.panel(ctx, 10, 9, side - 8, headerH);
+      ctx.method_51433(mc.field_1772, "V", 24, 27, Theme.ACCENT, true);
+      ctx.method_51433(mc.field_1772, "NIGHTFALL", 48, 23, Theme.TEXT, true);
+      ctx.method_51433(mc.field_1772, "PREMIUM CLIENT", 49, 39, Theme.TEXT_DIM, false);
+
+      int statusW = 190;
+      int statusX = sw - statusW - 12;
+      this.panel(ctx, statusX, 14, statusW, 27);
+      ctx.method_51433(mc.field_1772, "FPS", statusX + 9, 23, Theme.ACCENT, true);
+      ctx.method_51433(mc.field_1772, String.valueOf(mc.method_47599()), statusX + 34, 23, Theme.TEXT, false);
+      ctx.method_51433(mc.field_1772, "1.21.11", statusX + 104, 23, Theme.TEXT_DIM, false);
+
+      String[] nav = {"Combat", "Movement", "Visuals", "Player", "World", "Misc", "HUD", "Config"};
+      for (int i = 0; i < nav.length; i++) {
+         String tab = nav[i];
+         int ny = 78 + i * 35;
+         boolean active = tab.equals(this.activeTab);
+         boolean over = inside(mx, my, 12, ny, side - 12, 30);
+         if (active) {
+            ctx.method_25294(12, ny, side, ny + 30, Theme.withAlpha(Theme.ACCENT, 115));
+            ctx.method_25294(12, ny, 15, ny + 30, Theme.ACCENT);
+         } else if (over) {
+            ctx.method_25294(12, ny, side, ny + 30, Theme.withAlpha(Theme.ACCENT, 45));
+         }
+         ctx.method_51433(mc.field_1772, icon(tab), 23, ny + 10, Theme.ACCENT, true);
+         ctx.method_51433(mc.field_1772, tab, 49, ny + 10, active ? Theme.TEXT : Theme.TEXT_DIM, true);
+         if (click && over) {
+            this.activeTab = tab;
+            this.tabChangedAt = System.nanoTime();
+         }
+      }
+
+      int profileY = sh - 57;
+      this.panel(ctx, 12, profileY, side - 20, 45);
+      ctx.method_51433(mc.field_1772, "FW", 22, profileY + 12, Theme.ACCENT, true);
+      ctx.method_51433(mc.field_1772, "Finni0512", 49, profileY + 10, Theme.TEXT, true);
+      ctx.method_51433(mc.field_1772, "Premium", 49, profileY + 25, Theme.ACCENT, false);
+
+      String[] visibleTabs = {"Combat", "Visuals", "Player", "HUD"};
+      int[] xs = {x1, x2, x1, x2};
+      int[] ys = {topY, topY, bottomY, bottomY};
+      for (int i = 0; i < visibleTabs.length; i++) {
+         String tab = visibleTabs[i];
+         if (this.opened(tab)) {
+            this.drawWindow(ctx, tab, xs[i], ys[i], panelW, mx, my, click, rightClick, mc);
+         }
+      }
+
+      ctx.method_51433(mc.field_1772, "+", sw / 2 - 4, sh / 2 - 5, Theme.ACCENT, true);
+
+      if (this.numberSlider != null) {
+         float amount = Math.max(0.0F, Math.min(1.0F, (float)(mx - this.numberSliderX) / Math.max(1, this.numberSliderW)));
+         this.numberSlider.set(this.numberSlider.min + amount * (this.numberSlider.max - this.numberSlider.min));
+         if (release) {
+            Config.save();
+            this.numberSlider = null;
+         }
+      }
+
+      if (this.editingColor != null || this.editingString != null || this.editingMessages != null || this.editingList != null) {
+         this.drawTextEditor(ctx);
+      }
+      if (System.currentTimeMillis() < this.feedbackUntil) {
+         this.drawFeedback(ctx);
+      }
+
+      if (this.draggingWindow && this.dragPanel != null) {
+         int[] dragged = this.panel(this.dragPanel, x1, topY);
+         if (left) {
+            dragged[0] = Math.max(8, Math.min(sw - panelW - 8, mx - this.dragX));
+            dragged[1] = Math.max(55, Math.min(sh - 50, my - this.dragY));
+         } else {
+            this.draggingWindow = false;
+            this.dragPanel = null;
+            Config.save();
+         }
+      }
+      return true;
    }
 
    private void drawWindow(class_332 ctx, String tab, int x, int y, int w, int mx, int my, boolean click, boolean rightClick, class_310 mc) {
