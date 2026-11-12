@@ -524,7 +524,8 @@ public final class NightfallGuiScreen extends class_437 {
 
    private boolean drawPremiumLayout(class_332 ctx, int mx, int my, boolean click, boolean release, boolean rightClick, boolean left, class_310 mc) {
       if (this.field_22789 < 720 || this.field_22790 < 400) {
-         return false;
+         this.drawCompactPremiumLayout(ctx, mx, my, click, rightClick, mc);
+         return true;
       }
 
       int sw = this.field_22789;
@@ -622,6 +623,69 @@ public final class NightfallGuiScreen extends class_437 {
          }
       }
       return true;
+   }
+
+   private void drawCompactPremiumLayout(class_332 ctx, int mx, int my, boolean click, boolean rightClick, class_310 mc) {
+      int sw = this.field_22789;
+      int sh = this.field_22790;
+      int side = Math.max(82, Math.min(126, sw / 4));
+      int headerH = 46;
+      ctx.method_25294(0, 0, sw, sh, -1459091184);
+      int shade = Math.max(0, Math.min(150, Config.blurStrength));
+      ctx.method_25294(0, 0, sw, sh, shade << 24 | 526095);
+      ctx.method_25294(0, 0, sw, 3, Theme.ACCENT);
+
+      this.panel(ctx, 8, 8, sw - 16, headerH);
+      ctx.method_51433(mc.field_1772, "V", 17, 19, Theme.ACCENT, true);
+      ctx.method_51433(mc.field_1772, "NIGHTFALL", 37, 17, Theme.TEXT, true);
+      ctx.method_51433(mc.field_1772, "PREMIUM CLIENT", 38, 31, Theme.TEXT_DIM, false);
+      ctx.method_51433(mc.field_1772, "FPS " + mc.method_47599(), sw - 74, 23, Theme.ACCENT, true);
+
+      String[] nav = {"Combat", "Movement", "Visuals", "Player", "World", "Misc", "HUD", "Config"};
+      int navY = headerH + 18;
+      int navStep = Math.max(21, Math.min(27, (sh - navY - 40) / nav.length));
+      for (int i = 0; i < nav.length; i++) {
+         String tab = nav[i];
+         int ny = navY + i * navStep;
+         boolean active = tab.equals(this.activeTab);
+         boolean over = inside(mx, my, 7, ny, side - 8, navStep - 2);
+         if (active) {
+            ctx.method_25294(7, ny, side, ny + navStep - 2, Theme.withAlpha(Theme.ACCENT, 115));
+            ctx.method_25294(7, ny, 10, ny + navStep - 2, Theme.ACCENT);
+         } else if (over) {
+            ctx.method_25294(7, ny, side, ny + navStep - 2, Theme.withAlpha(Theme.ACCENT, 45));
+         }
+         String label = tab.length() > 9 ? tab.substring(0, 8) : tab;
+         ctx.method_51433(mc.field_1772, label, 15, ny + Math.max(4, (navStep - 8) / 2), active ? Theme.TEXT : Theme.TEXT_DIM, true);
+         if (click && over) {
+            this.activeTab = tab;
+            this.tabChangedAt = System.nanoTime();
+            this.scroll = 0;
+            click = false;
+         }
+      }
+
+      int profileY = Math.max(navY + nav.length * navStep + 3, sh - 31);
+      if (profileY + 25 < sh) {
+         ctx.method_51433(mc.field_1772, "Finni0512", 10, profileY, Theme.TEXT, true);
+         ctx.method_51433(mc.field_1772, "Premium", 10, profileY + 12, Theme.ACCENT, false);
+      }
+
+      int panelX = side + 8;
+      int panelY = headerH + 10;
+      int panelW = Math.max(150, sw - panelX - 8);
+      this.drawWindow(ctx, this.activeTab, panelX, panelY, panelW, mx, my, click, rightClick, mc);
+
+      if (this.numberSlider != null) {
+         float amount = Math.max(0.0F, Math.min(1.0F, (float)(mx - this.numberSliderX) / Math.max(1, this.numberSliderW)));
+         this.numberSlider.set(this.numberSlider.min + amount * (this.numberSlider.max - this.numberSlider.min));
+      }
+      if (this.editingColor != null || this.editingString != null || this.editingMessages != null || this.editingList != null) {
+         this.drawTextEditor(ctx);
+      }
+      if (System.currentTimeMillis() < this.feedbackUntil) {
+         this.drawFeedback(ctx);
+      }
    }
 
    private void drawWindow(class_332 ctx, String tab, int x, int y, int w, int mx, int my, boolean click, boolean rightClick, class_310 mc) {
