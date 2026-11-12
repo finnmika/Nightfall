@@ -1115,7 +1115,6 @@ public final class NightfallGuiScreen extends class_437 {
       this.beginConfigSlider(click, mx, my, x + 10, y + 368, w - 20, "radius");
       this.beginConfigSlider(click, mx, my, x + 10, y + 406, w - 20, "scale");
       this.beginConfigSlider(click, mx, my, x + 10, y + 444, w - 20, "margin");
-      this.updateConfigSlider(mx, click || this.slider.length() > 0, false);
       if (click) {
          Config.save();
       }
@@ -1129,7 +1128,7 @@ public final class NightfallGuiScreen extends class_437 {
    }
 
    private void beginConfigSlider(boolean click, int mx, int my, int x, int y, int w, String id) {
-      if (click && inside(mx, my, x, y, w, 14)) {
+      if (click && inside(mx, my, x, y - 3, w, 20)) {
          this.slider = id;
          this.sliderX = x;
          this.sliderW = w;
@@ -1199,17 +1198,30 @@ public final class NightfallGuiScreen extends class_437 {
    }
 
    private static void roundedRect(class_332 c, int x, int y, int w, int h, int radius, int color) {
+      if (w <= 0 || h <= 0) return;
       int r = Math.max(1, Math.min(radius, Math.min(w, h) / 2));
+      int baseAlpha = color >>> 24 & 255;
       for (int row = 0; row < h; row++) {
-         int inset = 0;
+         double inset = 0.0;
          if (row < r) {
             double dy = r - row - 0.5;
-            inset = r - (int)Math.floor(Math.sqrt(Math.max(0.0, r * r - dy * dy)));
+            inset = r - Math.sqrt(Math.max(0.0, r * r - dy * dy));
          } else if (row >= h - r) {
             double dy = row - (h - r) + 0.5;
-            inset = r - (int)Math.floor(Math.sqrt(Math.max(0.0, r * r - dy * dy)));
+            inset = r - Math.sqrt(Math.max(0.0, r * r - dy * dy));
          }
-         c.method_25294(x + inset, y + row, x + w - inset, y + row + 1, color);
+         int edge = (int)Math.floor(inset);
+         double coverage = 1.0 - (inset - edge);
+         int left = x + edge;
+         int right = x + w - edge - 1;
+         if (coverage > 0.02 && baseAlpha > 0) {
+            int edgeColor = (Math.max(0, Math.min(255, (int)Math.round(baseAlpha * coverage))) << 24) | (color & 0xFFFFFF);
+            c.method_25294(left, y + row, left + 1, y + row + 1, edgeColor);
+            if (right != left) c.method_25294(right, y + row, right + 1, y + row + 1, edgeColor);
+         }
+         int innerLeft = left + 1;
+         int innerRight = right;
+         if (innerRight > innerLeft) c.method_25294(innerLeft, y + row, innerRight, y + row + 1, color);
       }
    }
 
