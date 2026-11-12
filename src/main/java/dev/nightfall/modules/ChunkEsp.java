@@ -178,21 +178,26 @@ public final class ChunkEsp extends Module {
                   int alpha = (int)(this.opacity.get() * 255.0 * fade);
                   int color = 0xFF000000 | baseColor & 16777215;
                   String label = this.mode.get();
-                  class_238 box;
+                  double boxMinY;
+                  double boxMaxY;
                   switch (label) {
                      case "Surface":
-                        box = new class_238(x0, py - 0.06, z0, x1, py - 0.02, z1);
+                        boxMinY = py - 0.06;
+                        boxMaxY = py - 0.02;
                         break;
                      case "Pulse":
                         double hh = h * (0.65 + 0.35 * pulse);
-                        box = new class_238(x0, py - hh / 2.0, z0, x1, py + hh / 2.0, z1);
+                        boxMinY = py - hh / 2.0;
+                        boxMaxY = py + hh / 2.0;
                         alpha = (int)(alpha * (0.55 + 0.45 * pulse));
                         break;
                      default:
-                        box = new class_238(x0, y0, z0, x1, y0 + h, z1);
+                        boxMinY = y0;
+                        boxMaxY = y0 + h;
                   }
 
-                  if (Draw.box(ctx, box, Theme.withAlpha(color, alpha), this.thick.getInt(), true, false)) {
+                  if (Draw.box(ctx, x0, boxMinY, z0, x1, boxMaxY, z1,
+                     Theme.withAlpha(color, alpha), this.thick.getInt(), true, true)) {
                      label = (r.favorite && this.showFavorites.get() ? "★ " : "")
                         + (r.status == ChunkResult.Status.GONE ? "SUS WEG" : "SUS")
                         + (r.count > 1 ? " · " + r.count + " Chunks" : "")
