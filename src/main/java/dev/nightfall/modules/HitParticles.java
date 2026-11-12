@@ -56,9 +56,9 @@ public final class HitParticles extends Module {
    }
 
    private void burst(class_1309 entity) {
-      String i = this.style.get();
+      String styleName = this.style.get();
 
-      class_2394 p = switch (i) {
+      class_2394 p = switch (styleName) {
          case "Herzen" -> class_2398.field_11201;
          case "Flamme" -> class_2398.field_11240;
          case "Witch" -> class_2398.field_11249;
@@ -67,7 +67,7 @@ public final class HitParticles extends Module {
          default -> class_2398.field_11205;
       };
 
-      for (int i = 0; i < this.amount.getInt(); i++) {
+      for (int particleIndex = 0; particleIndex < this.amount.getInt(); particleIndex++) {
          double dx = (Math.random() - 0.5) * 0.8;
          double dy = Math.random() * 1.5;
          double dz = (Math.random() - 0.5) * 0.8;
