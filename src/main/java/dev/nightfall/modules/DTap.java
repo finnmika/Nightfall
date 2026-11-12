@@ -26,6 +26,8 @@ public class DTap extends Module {
    private int targetId = -1;
    private class_2338 firstBase;
    private class_2338 secondBase;
+   private int trackedTargetId = -1;
+   private float lastTargetHealth = Float.NaN;
 
    public DTap() {
       super("DTap", "Eigenstaendige Double-Crystal-Kombo mit genau zwei Crystals.", Category.COMBAT);
@@ -46,6 +48,8 @@ public class DTap extends Module {
       targetId = -1;
       firstBase = null;
       secondBase = null;
+      trackedTargetId = -1;
+      lastTargetHealth = Float.NaN;
    }
 
    private boolean entityFree(class_2338 pos, double minY, double maxY) {
@@ -75,20 +79,19 @@ public class DTap extends Module {
       return validBase(base);
    }
 
-   private class_2338[] findBases(class_746 player, class_1657 target) {
+   private class_2338 findSideBase(class_746 player, class_1657 target) {
       double dx = target.method_23317() - player.method_23317();
       double dz = target.method_23321() - player.method_23321();
-      int sx = Math.abs(dx) >= Math.abs(dz) ? (dx >= 0 ? 1 : -1) : 0;
-      int sz = sx == 0 ? (dz >= 0 ? 1 : -1) : 0;
-      int[][] directions = {{sx, sz}, {-sz, sx}, {sz, -sx}, {-sx, -sz}};
+      int forwardX = Math.abs(dx) >= Math.abs(dz) ? (dx >= 0 ? 1 : -1) : 0;
+      int forwardZ = forwardX == 0 ? (dz >= 0 ? 1 : -1) : 0;
+      // First try the target's left side, then the right side.
+      int leftX = -forwardZ;
+      int leftZ = forwardX;
       class_2338 feet = target.method_24515();
-      for (int[] dir : directions) {
-         class_2338 one = feet.method_10069(dir[0] * 2, -1, dir[1] * 2);
-         class_2338 two = feet.method_10069(dir[0] * 4, -1, dir[1] * 2);
-         if (usableBase(one) && usableBase(two) && player.method_5739(target) <= targetRange.get() + 3.0) {
-            return new class_2338[]{one, two};
-         }
-      }
+      class_2338 left = feet.method_10069(leftX * 2, -1, leftZ * 2);
+      class_2338 right = feet.method_10069(-leftX * 2, -1, -leftZ * 2);
+      if (usableBase(left)) return left;
+      if (usableBase(right)) return right;
       return null;
    }
 
