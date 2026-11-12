@@ -1109,10 +1109,10 @@ public final class NightfallGuiScreen extends class_437 {
       }
 
       this.beginConfigSlider(click, mx, my, x + 10, y + 292, w - 20, "transparency");
-      this.beginConfigSlider(click, mx, x + 10, y + 330, w - 20, "border");
-      this.beginConfigSlider(click, mx, x + 10, y + 368, w - 20, "radius");
-      this.beginConfigSlider(click, mx, x + 10, y + 406, w - 20, "scale");
-      this.beginConfigSlider(click, mx, x + 10, y + 444, w - 20, "margin");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 330, w - 20, "border");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 368, w - 20, "radius");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 406, w - 20, "scale");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 444, w - 20, "margin");
       this.updateConfigSlider(mx, click || this.slider.length() > 0, false);
       if (click) {
          Config.save();
