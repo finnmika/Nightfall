@@ -44,9 +44,9 @@ public final class MovementParticles extends Module {
    }
 
    private void burst(boolean ring) {
-      String n = this.effect.get();
+      String effectName = this.effect.get();
 
-      class_2394 p = switch (n) {
+      class_2394 p = switch (effectName) {
          case "Soul" -> class_2398.field_23114;
          case "Portal" -> class_2398.field_11214;
          case "Herzen" -> class_2398.field_11201;
@@ -55,10 +55,10 @@ public final class MovementParticles extends Module {
          case "End Rod" -> class_2398.field_11207;
          default -> class_2398.field_11220;
       };
-      int n = this.amount.getInt() * (ring ? 4 : 1);
+      int particleCount = this.amount.getInt() * (ring ? 4 : 1);
 
-      for (int i = 0; i < n; i++) {
-         double a = (Math.PI * 2) * i / n;
+      for (int i = 0; i < particleCount; i++) {
+         double a = (Math.PI * 2) * i / particleCount;
          double r = ring ? 0.65 : 0.28;
          double x = mc.field_1724.method_23317() + Math.cos(a) * r + (Math.random() - 0.5) * 0.12;
          double z = mc.field_1724.method_23321() + Math.sin(a) * r + (Math.random() - 0.5) * 0.12;
