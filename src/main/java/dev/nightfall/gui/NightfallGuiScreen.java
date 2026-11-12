@@ -736,19 +736,7 @@ public final class NightfallGuiScreen extends class_437 {
       roundedRect(ctx, x, y, w, 25, Config.cornerRadius, -300937959);
       roundedRect(ctx, x, y, Math.max(2, Config.borderSize), 25, 2, Theme.ACCENT);
       ctx.method_51433(mc.field_1772, icon(tab) + "  " + tab, x + 10, y + 9, Theme.TEXT, true);
-      ctx.method_51433(mc.field_1772, "_", x + w - 35, y + 8, Theme.TEXT_DIM, true);
-      ctx.method_51433(mc.field_1772, "x", x + w - 17, y + 8, Theme.TEXT, true);
       if (click && inside(mx, my, x, y, w, 25)) {
-         if (mx >= x + w - 22) {
-            this.setOpen(tab, false);
-            return;
-         }
-
-         if (mx >= x + w - 43) {
-            this.pMin(tab);
-            return;
-         }
-
          this.draggingWindow = true;
          this.dragPanel = tab;
          this.dragX = mx - x;
@@ -1052,21 +1040,21 @@ public final class NightfallGuiScreen extends class_437 {
       ctx.method_51433(mc.field_1772, "Akzentfarbe · Farbton", x + 10, y + 185, Theme.TEXT, false);
       this.drawSlider(ctx, x + 10, y + 207, w - 20, Config.accentHue / 360.0F);
       ctx.method_51433(mc.field_1772, String.format(Locale.ROOT, "%.0f°", Config.accentHue), x + w - 42, y + 192, Theme.ACCENT, false);
-      ctx.method_51433(mc.field_1772, "Hintergrund · Blur-Stärke", x + 10, y + 232, Theme.TEXT, false);
-      this.drawSlider(ctx, x + 10, y + 254, w - 20, Config.blurStrength / 150.0F);
+      ctx.method_51433(mc.field_1772, "Hintergrund · Blur-Stärke", x + 10, y + 224, Theme.TEXT, false);
+      this.drawSlider(ctx, x + 10, y + 246, w - 20, Config.blurStrength / 150.0F);
       ctx.method_51433(
          mc.field_1772,
          Config.blurStrength == 0 ? "Aus" : (Config.blurStrength < 60 ? "Leicht" : (Config.blurStrength < 110 ? "Mittel" : "Stark")),
          x + w - 48,
-         y + 239,
+         y + 231,
          Theme.ACCENT,
          false
       );
-      this.drawConfigSlider(ctx, mc, "Transparenz", Config.guiTransparency + "%", "transparency", x + 10, y + 278, w - 20, (Config.guiTransparency - 35) / 65.0F);
-      this.drawConfigSlider(ctx, mc, "Randgröße", Config.borderSize + " px", "border", x + 10, y + 316, w - 20, (Config.borderSize - 1) / 5.0F);
-      this.drawConfigSlider(ctx, mc, "Rundungen", Config.cornerRadius + " px", "radius", x + 10, y + 354, w - 20, (Config.cornerRadius - 4) / 18.0F);
-      this.drawConfigSlider(ctx, mc, "Menügröße", Config.guiScalePercent + "%", "scale", x + 10, y + 392, w - 20, (Config.guiScalePercent - 70) / 30.0F);
-      this.drawConfigSlider(ctx, mc, "Randabstand", Config.guiEdgeMargin + " px", "margin", x + 10, y + 430, w - 20, Config.guiEdgeMargin / 60.0F);
+      this.drawConfigSlider(ctx, mc, "Transparenz", Config.guiTransparency + "%", "transparency", x + 10, y + 262, w - 20, (Config.guiTransparency - 35) / 65.0F);
+      this.drawConfigSlider(ctx, mc, "Randgröße", Config.borderSize + " px", "border", x + 10, y + 300, w - 20, (Config.borderSize - 1) / 5.0F);
+      this.drawConfigSlider(ctx, mc, "Rundungen", Config.cornerRadius + " px", "radius", x + 10, y + 338, w - 20, (Config.cornerRadius - 4) / 18.0F);
+      this.drawConfigSlider(ctx, mc, "Menügröße", Config.guiScalePercent + "%", "scale", x + 10, y + 376, w - 20, (Config.guiScalePercent - 70) / 30.0F);
+      this.drawConfigSlider(ctx, mc, "Randabstand", Config.guiEdgeMargin + " px", "margin", x + 10, y + 414, w - 20, Config.guiEdgeMargin / 60.0F);
       if (click && inside(mx, my, x + 10, y + 202, w - 20, 12)) {
          this.slider = "hue";
          this.sliderX = x + 10;
@@ -1075,7 +1063,7 @@ public final class NightfallGuiScreen extends class_437 {
          this.applyHue();
       }
 
-      if (click && inside(mx, my, x + 10, y + 249, w - 20, 12)) {
+      if (click && inside(mx, my, x + 10, y + 241, w - 20, 12)) {
          this.slider = "blur";
          this.sliderX = x + 10;
          this.sliderW = w - 20;
@@ -1106,11 +1094,11 @@ public final class NightfallGuiScreen extends class_437 {
          Config.guiAnimationSpeed = Config.guiAnimationSpeed >= 5.0F ? 0.1F : Math.min(5.0F, Config.guiAnimationSpeed + 0.1F);
       }
 
-      this.beginConfigSlider(click, mx, my, x + 10, y + 292, w - 20, "transparency");
-      this.beginConfigSlider(click, mx, my, x + 10, y + 330, w - 20, "border");
-      this.beginConfigSlider(click, mx, my, x + 10, y + 368, w - 20, "radius");
-      this.beginConfigSlider(click, mx, my, x + 10, y + 406, w - 20, "scale");
-      this.beginConfigSlider(click, mx, my, x + 10, y + 444, w - 20, "margin");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 276, w - 20, "transparency");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 314, w - 20, "border");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 352, w - 20, "radius");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 390, w - 20, "scale");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 428, w - 20, "margin");
       if (click) {
          Config.save();
       }
@@ -1194,30 +1182,47 @@ public final class NightfallGuiScreen extends class_437 {
    }
 
    private static void roundedRect(class_332 c, int x, int y, int w, int h, int radius, int color) {
-      if (w <= 0 || h <= 0) return;
+      if (w <= 0 || h <= 0 || (color >>> 24 & 255) == 0) return;
       int r = Math.max(1, Math.min(radius, Math.min(w, h) / 2));
       int baseAlpha = color >>> 24 & 255;
+      int rgb = color & 0xFFFFFF;
+      final int samples = 4;
+
       for (int row = 0; row < h; row++) {
-         double inset = 0.0;
-         if (row < r) {
-            double dy = r - row - 0.5;
-            inset = r - Math.sqrt(Math.max(0.0, r * r - dy * dy));
-         } else if (row >= h - r) {
-            double dy = row - (h - r) + 0.5;
-            inset = r - Math.sqrt(Math.max(0.0, r * r - dy * dy));
+         double insetTotal = 0.0;
+         for (int sample = 0; sample < samples; sample++) {
+            double py = row + (sample + 0.5) / samples;
+            double inset = 0.0;
+            if (py < r) {
+               double dy = r - py;
+               inset = r - Math.sqrt(Math.max(0.0, r * r - dy * dy));
+            } else if (py > h - r) {
+               double dy = py - (h - r);
+               inset = r - Math.sqrt(Math.max(0.0, r * r - dy * dy));
+            }
+            insetTotal += Math.max(0.0, inset);
          }
-         int edge = (int)Math.floor(inset);
-         double coverage = 1.0 - (inset - edge);
+
+         double inset = insetTotal / samples;
+         int edge = Math.max(0, Math.min(w / 2, (int)Math.floor(inset)));
+         double coverage = Math.max(0.0, Math.min(1.0, 1.0 - (inset - Math.floor(inset))));
          int left = x + edge;
          int right = x + w - edge - 1;
-         if (coverage > 0.02 && baseAlpha > 0) {
-            int edgeColor = (Math.max(0, Math.min(255, (int)Math.round(baseAlpha * coverage))) << 24) | (color & 0xFFFFFF);
+
+         if (coverage > 0.015) {
+            int alpha = Math.max(0, Math.min(255, (int)Math.round(baseAlpha * coverage)));
+            int edgeColor = (alpha << 24) | rgb;
             c.method_25294(left, y + row, left + 1, y + row + 1, edgeColor);
-            if (right != left) c.method_25294(right, y + row, right + 1, y + row + 1, edgeColor);
+            if (right != left) {
+               c.method_25294(right, y + row, right + 1, y + row + 1, edgeColor);
+            }
          }
+
          int innerLeft = left + 1;
          int innerRight = right;
-         if (innerRight > innerLeft) c.method_25294(innerLeft, y + row, innerRight, y + row + 1, color);
+         if (innerRight > innerLeft) {
+            c.method_25294(innerLeft, y + row, innerRight, y + row + 1, color);
+         }
       }
    }
 
