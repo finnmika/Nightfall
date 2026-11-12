@@ -65,8 +65,18 @@ public final class Projection {
             ey = cameraPos.field_1351;
             ez = cameraPos.field_1350;
             GameRendererAccessor renderer = (GameRendererAccessor)mc.field_1773;
-            float fov = renderer.nightfall$invokeGetFov(camera, frameTickDelta, true);
-            if (Float.isFinite(fov) && !(fov <= 0.0F)) {
+            // Read the camera's effective projection instead of GameRenderer#getFov.
+            // Zoomify changes Camera's projection while its zoom key is held, so the
+            // renderer FOV alone can be stale and make ESP boxes drift away from entities.
+            CameraProjectionAccessor cameraProjection = (CameraProjectionAccessor) camera.method_36425();
+            class_243 halfHeight = cameraProjection.nightfall$getHalfHeight();
+            double halfHeightLength = Math.sqrt(
+               halfHeight.field_1352 * halfHeight.field_1352
+                  + halfHeight.field_1351 * halfHeight.field_1351
+                  + halfHeight.field_1350 * halfHeight.field_1350
+            );
+            float fov = (float) Math.toDegrees(2.0 * Math.atan(halfHeightLength));
+            if (Float.isFinite(fov) && fov > 0.0F) {
                Matrix4f projection = renderer.nightfall$invokeGetProjectionMatrix(fov);
                Quaternionf inverseCameraRotation = camera.method_23767().conjugate(new Quaternionf());
                Matrix4f view = new Matrix4f().rotation(inverseCameraRotation);
