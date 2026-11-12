@@ -164,8 +164,9 @@ public final class ChunkEsp extends Module {
                double z1 = z0 + r.depth * 16.0;
                double h = this.height.get();
                double y0 = py - h / 2.0;
-               double regionDistance = new class_243(mc.field_1724.method_23317(), py, mc.field_1724.method_23321())
-                  .method_1022(new class_243((x0 + x1) / 2.0, py, (z0 + z1) / 2.0));
+               double rdx = (x0 + x1) * 0.5 - Projection.eyeX();
+               double rdz = (z0 + z1) * 0.5 - Projection.eyeZ();
+               double regionDistance = Math.sqrt(rdx * rdx + rdz * rdz);
                double fade = 1.0;
                if (this.fadeDistance.get()) {
                   double normalized = regionDistance / Math.max(16.0, this.dist.get() * 16.0);
