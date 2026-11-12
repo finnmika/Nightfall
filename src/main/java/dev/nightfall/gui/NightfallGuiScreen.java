@@ -451,6 +451,8 @@ public final class NightfallGuiScreen extends class_437 {
       }
 
       this.drawWindow(ctx, this.activeTab, x + offsetX, yx + offsetY, w, mx, my, click, rightClick, mc);
+      this.updateConfigSlider(mx, left, release);
+      this.updateConfigSlider(mx, left, release);
       if (this.numberSlider != null) {
          float amount = Math.max(0.0F, Math.min(1.0F, (float)(mx - this.numberSliderX) / Math.max(1, this.numberSliderW)));
          this.numberSlider.set(this.numberSlider.min + amount * (this.numberSlider.max - this.numberSlider.min));
@@ -524,7 +526,7 @@ public final class NightfallGuiScreen extends class_437 {
 
    private boolean drawPremiumLayout(class_332 ctx, int mx, int my, boolean click, boolean release, boolean rightClick, boolean left, class_310 mc) {
       if (this.field_22789 < 720 || this.field_22790 < 400) {
-         this.drawCompactPremiumLayout(ctx, mx, my, click, rightClick, mc);
+         this.drawCompactPremiumLayout(ctx, mx, my, click, release, rightClick, left, mc);
          return true;
       }
 
@@ -537,12 +539,12 @@ public final class NightfallGuiScreen extends class_437 {
          click = false;
       }
       int side = Math.max(126, Math.min(150, sw / 6));
-      int x1 = side + 18;
-      int gap = 12;
-      int panelW = Math.min(310, (sw - x1 - 30 - gap) / 2);
+      int x1 = side + 18 + edge;
+      int gap = Math.round(12 * scale);
+      int panelW = Math.min(Math.round(310 * scale), (sw - x1 - 30 - gap - edge) / 2);
       int x2 = x1 + panelW + gap;
-      int topY = 72;
-      int bottomY = Math.max(220, sh / 2 + 8);
+      int topY = 72 + edge;
+      int bottomY = Math.max(220 + edge, sh / 2 + 8);
       int headerH = 54;
 
       if (click && inside(mx, my, 8, 8, sw - 16, headerH)) {
@@ -556,13 +558,13 @@ public final class NightfallGuiScreen extends class_437 {
       ctx.method_25294(0, 0, sw, sh, shade << 24 | 526095);
       ctx.method_25294(0, 0, sw, 3, Theme.ACCENT);
 
-      this.panel(ctx, 10, 9, side - 8, headerH);
+      this.panel(ctx, 10 + edge, 9 + edge, side - 8, headerH);
       ctx.method_51433(mc.field_1772, "◒", 24, 27, Theme.ACCENT, true);
       ctx.method_51433(mc.field_1772, "NIGHTFALL", 48, 23, Theme.TEXT, true);
       ctx.method_51433(mc.field_1772, "PREMIUM CLIENT", 49, 39, Theme.TEXT_DIM, false);
 
       int statusW = 190;
-      int statusX = sw - statusW - 12;
+      int statusX = sw - statusW - 12 - edge;
       this.panel(ctx, statusX, 14, statusW, 27);
       ctx.method_51433(mc.field_1772, "FPS", statusX + 9, 23, Theme.ACCENT, true);
       ctx.method_51433(mc.field_1772, String.valueOf(mc.method_47599()), statusX + 34, 23, Theme.TEXT, false);
@@ -571,14 +573,14 @@ public final class NightfallGuiScreen extends class_437 {
       String[] nav = {"Combat", "Movement", "Visuals", "Player", "World", "Misc", "HUD", "Config"};
       for (int i = 0; i < nav.length; i++) {
          String tab = nav[i];
-         int ny = 78 + i * 35;
+         int ny = 78 + edge + i * Math.round(35 * scale);
          boolean active = tab.equals(this.activeTab);
-         boolean over = inside(mx, my, 12, ny, side - 12, 30);
+         boolean over = inside(mx, my, 12 + edge, ny, side - 12, Math.round(30 * scale));
          if (active) {
-            ctx.method_25294(12, ny, side, ny + 30, Theme.withAlpha(Theme.ACCENT, 115));
-            ctx.method_25294(12, ny, 15, ny + 30, Theme.ACCENT);
+            roundedRect(ctx, 12 + edge, ny, side - 12, Math.round(30 * scale), Config.cornerRadius, Theme.withAlpha(Theme.ACCENT, 115));
+            roundedRect(ctx, 12 + edge, ny, 3, Math.round(30 * scale), 2, Theme.ACCENT);
          } else if (over) {
-            ctx.method_25294(12, ny, side, ny + 30, Theme.withAlpha(Theme.ACCENT, 45));
+            roundedRect(ctx, 12 + edge, ny, side - 12, Math.round(30 * scale), Config.cornerRadius, Theme.withAlpha(Theme.ACCENT, 45));
          }
          ctx.method_51433(mc.field_1772, icon(tab), 23, ny + 10, Theme.ACCENT, true);
          ctx.method_51433(mc.field_1772, tab, 49, ny + 10, active ? Theme.TEXT : Theme.TEXT_DIM, true);
@@ -589,8 +591,8 @@ public final class NightfallGuiScreen extends class_437 {
          }
       }
 
-      int profileY = sh - 57;
-      this.panel(ctx, 12, profileY, side - 20, 45);
+      int profileY = sh - 57 - edge;
+      this.panel(ctx, 12 + edge, profileY, side - 20, 45);
       ctx.method_51433(mc.field_1772, "FW", 22, profileY + 12, Theme.ACCENT, true);
       ctx.method_51433(mc.field_1772, "Finni0512", 49, profileY + 10, Theme.TEXT, true);
       ctx.method_51433(mc.field_1772, "Premium", 49, profileY + 25, Theme.ACCENT, false);
@@ -641,24 +643,26 @@ public final class NightfallGuiScreen extends class_437 {
       return true;
    }
 
-   private void drawCompactPremiumLayout(class_332 ctx, int mx, int my, boolean click, boolean rightClick, class_310 mc) {
+   private void drawCompactPremiumLayout(class_332 ctx, int mx, int my, boolean click, boolean release, boolean rightClick, boolean left, class_310 mc) {
+      float scale = Config.guiScalePercent / 100.0F;
+      int edge = Config.guiEdgeMargin;
       int sw = this.field_22789;
       int sh = this.field_22790;
-      int side = Math.max(82, Math.min(126, sw / 4));
+      int side = Math.max(82, Math.min(126, Math.round(sw / 4.0F * scale)));
       int headerH = 46;
       ctx.method_25294(0, 0, sw, sh, -1459091184);
       int shade = Math.max(0, Math.min(150, Config.blurStrength));
       ctx.method_25294(0, 0, sw, sh, shade << 24 | 526095);
       ctx.method_25294(0, 0, sw, 3, Theme.ACCENT);
 
-      this.panel(ctx, 8, 8, sw - 16, headerH);
+      this.panel(ctx, 8 + edge, 8 + edge, sw - 16 - edge * 2, headerH);
       ctx.method_51433(mc.field_1772, "◒", 17, 19, Theme.ACCENT, true);
       ctx.method_51433(mc.field_1772, "NIGHTFALL", 37, 17, Theme.TEXT, true);
       ctx.method_51433(mc.field_1772, "PREMIUM CLIENT", 38, 31, Theme.TEXT_DIM, false);
       ctx.method_51433(mc.field_1772, "FPS " + mc.method_47599(), sw - 74, 23, Theme.ACCENT, true);
 
       String[] nav = {"Combat", "Movement", "Visuals", "Player", "World", "Misc", "HUD", "Config"};
-      int navY = headerH + 18;
+      int navY = headerH + 18 + edge;
       int navStep = Math.max(21, Math.min(27, (sh - navY - 40) / nav.length));
       for (int i = 0; i < nav.length; i++) {
          String tab = nav[i];
@@ -687,9 +691,9 @@ public final class NightfallGuiScreen extends class_437 {
          ctx.method_51433(mc.field_1772, "Premium", 10, profileY + 12, Theme.ACCENT, false);
       }
 
-      int panelX = side + 8;
-      int panelY = headerH + 10;
-      int panelW = Math.max(150, sw - panelX - 8);
+      int panelX = side + 8 + edge;
+      int panelY = headerH + 10 + edge;
+      int panelW = Math.max(150, sw - panelX - 8 - edge);
       this.drawWindow(ctx, this.activeTab, panelX, panelY, panelW, mx, my, click, rightClick, mc);
 
       if (this.numberSlider != null) {
@@ -728,7 +732,7 @@ public final class NightfallGuiScreen extends class_437 {
       }
       int bodyH = this.pMinimized(tab)
          ? 0
-         : Math.max(0, Math.min(availableBody, tab.equals("Config") ? 340 : Math.max(82, visible + 34)));
+         : Math.max(0, Math.min(availableBody, tab.equals("Config") ? 470 : Math.max(82, visible + 34)));
       this.panel(ctx, x, y, w, 25 + bodyH);
       ctx.method_25294(x, y, x + w, y + 25, -300937959);
       ctx.method_25294(x, y, x + 2, y + 25, Theme.ACCENT);
@@ -1059,9 +1063,11 @@ public final class NightfallGuiScreen extends class_437 {
          Theme.ACCENT,
          false
       );
-      this.drawConfigOption(ctx, mc, "Transparenz", Config.guiTransparency + "%", x + 10, y + 278, w - 20);
-      this.drawConfigOption(ctx, mc, "Randgröße", Config.borderSize + " px", x + 10, y + 298, w - 20);
-      this.drawConfigOption(ctx, mc, "Rundungen", Config.cornerRadius + " px", x + 10, y + 318, w - 20);
+      this.drawConfigSlider(ctx, mc, "Transparenz", Config.guiTransparency + "%", "transparency", x + 10, y + 278, w - 20, (Config.guiTransparency - 35) / 65.0F);
+      this.drawConfigSlider(ctx, mc, "Randgröße", Config.borderSize + " px", "border", x + 10, y + 316, w - 20, (Config.borderSize - 1) / 5.0F);
+      this.drawConfigSlider(ctx, mc, "Rundungen", Config.cornerRadius + " px", "radius", x + 10, y + 354, w - 20, (Config.cornerRadius - 4) / 18.0F);
+      this.drawConfigSlider(ctx, mc, "Menügröße", Config.guiScalePercent + "%", "scale", x + 10, y + 392, w - 20, (Config.guiScalePercent - 70) / 30.0F);
+      this.drawConfigSlider(ctx, mc, "Randabstand", Config.guiEdgeMargin + " px", "margin", x + 10, y + 430, w - 20, Config.guiEdgeMargin / 60.0F);
       if (click && inside(mx, my, x + 10, y + 202, w - 20, 12)) {
          this.slider = "hue";
          this.sliderX = x + 10;
@@ -1101,17 +1107,45 @@ public final class NightfallGuiScreen extends class_437 {
          Config.guiAnimationSpeed = Config.guiAnimationSpeed >= 5.0F ? 0.1F : Math.min(5.0F, Config.guiAnimationSpeed + 0.1F);
       }
 
-      if (click && inside(mx, my, x + 10, y + 278, w - 20, 18)) {
-         Config.guiTransparency = Config.guiTransparency >= 95 ? 35 : Config.guiTransparency + 10;
-      }
-      if (click && inside(mx, my, x + 10, y + 298, w - 20, 18)) {
-         Config.borderSize = Config.borderSize >= 5 ? 1 : Config.borderSize + 1;
-      }
-      if (click && inside(mx, my, x + 10, y + 318, w - 20, 18)) {
-         Config.cornerRadius = Config.cornerRadius >= 18 ? 6 : Config.cornerRadius + 2;
-      }
+      this.beginConfigSlider(click, mx, x + 10, y + 292, w - 20, "transparency");
+      this.beginConfigSlider(click, mx, x + 10, y + 330, w - 20, "border");
+      this.beginConfigSlider(click, mx, x + 10, y + 368, w - 20, "radius");
+      this.beginConfigSlider(click, mx, x + 10, y + 406, w - 20, "scale");
+      this.beginConfigSlider(click, mx, x + 10, y + 444, w - 20, "margin");
+      this.updateConfigSlider(mx, click || this.slider.length() > 0, false);
       if (click) {
          Config.save();
+      }
+   }
+
+   private void drawConfigSlider(class_332 ctx, class_310 mc, String label, String value, String id, int x, int y, int w, float amount) {
+      ctx.method_51433(mc.field_1772, label, x + 2, y, Theme.TEXT_DIM, false);
+      int vw = mc.field_1772.method_1727(value);
+      ctx.method_51433(mc.field_1772, value, x + w - vw - 2, y, Theme.ACCENT, true);
+      this.drawSlider(ctx, x, y + 17, w, amount);
+   }
+
+   private void beginConfigSlider(boolean click, int mx, int x, int y, int w, String id) {
+      if (click && inside(mx, this.lastMouseY, x, y, w, 14)) {
+         this.slider = id;
+         this.sliderX = x;
+         this.sliderW = w;
+      }
+   }
+
+   private void updateConfigSlider(int mx, boolean active, boolean release) {
+      if (this.slider.isEmpty()) return;
+      float t = Math.max(0.0F, Math.min(1.0F, (float)(mx - this.sliderX) / Math.max(1, this.sliderW)));
+      switch (this.slider) {
+         case "transparency" -> Config.guiTransparency = 35 + Math.round(t * 65);
+         case "border" -> Config.borderSize = 1 + Math.round(t * 5);
+         case "radius" -> Config.cornerRadius = 4 + Math.round(t * 18);
+         case "scale" -> Config.guiScalePercent = 70 + Math.round(t * 30);
+         case "margin" -> Config.guiEdgeMargin = Math.round(t * 60);
+      }
+      if (release) {
+         Config.save();
+         this.slider = "";
       }
    }
 
@@ -1128,9 +1162,10 @@ public final class NightfallGuiScreen extends class_437 {
    }
 
    private void drawSlider(class_332 ctx, int x, int y, int w, float t) {
-      ctx.method_25294(x, y, x + w, y + 4, -12567734);
-      ctx.method_25294(x, y, x + (int)(w * Math.max(0.0F, Math.min(1.0F, t))), y + 4, Theme.ACCENT);
-      ctx.method_25294(x + (int)(w * t) - 3, y - 3, x + (int)(w * t) + 3, y + 7, -1);
+      int clamped = Math.max(0, Math.min(w, Math.round(w * t)));
+      roundedRect(ctx, x, y, w, 5, 3, Theme.withAlpha(-12567734, 220));
+      roundedRect(ctx, x, y, Math.max(1, clamped), 5, 3, Theme.ACCENT);
+      roundedRect(ctx, x + clamped - 5, y - 3, 10, 11, 5, -1);
    }
 
    private void applyHue() {
