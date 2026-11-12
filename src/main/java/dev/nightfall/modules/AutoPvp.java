@@ -44,6 +44,8 @@ public class AutoPvp extends Module {
    private int crystalComboTicks;
    private int crystalComboTargetId = -1;
    private class_2338 crystalComboBase;
+   private boolean oneShotRequested;
+   private boolean oneShotRunning;
    private boolean driving;
    private boolean wasForward;
    private boolean wasSprint;
@@ -133,7 +135,7 @@ public class AutoPvp extends Module {
       }
    }
 
-   private void resetCrystalCombo() {\n      this.crystalComboPhase = 0;\n      this.crystalComboTicks = 0;\n      this.crystalComboTargetId = -1;\n      this.crystalComboBase = null;\n   }\n\n   private void clearDoubleTap() {
+   public void triggerDTab() {\n      this.oneShotRequested = true;\n      this.oneShotRunning = true;\n      if (!this.isEnabled()) this.setEnabled(true);\n   }\n\n   private void resetCrystalCombo() {\n      this.crystalComboPhase = 0;\n      this.crystalComboTicks = 0;\n      this.crystalComboTargetId = -1;\n      this.crystalComboBase = null;\n   }\n\n   private void clearDoubleTap() {
       this.dtapPending = false;
       this.dtapTargetId = -1;
       this.dtapTicks = 0;
@@ -478,7 +480,7 @@ public class AutoPvp extends Module {
 
             this.aimAt(target.method_23317(), target.method_23323(0.5), target.method_23321());
             double distance = p.method_5739(target);
-            if (this.tickCrystalCombo(p, target)) { this.driving = true; return; }
+            if (this.tickCrystalCombo(p, target)) { this.driving = true; return; }\n            if (this.oneShotRunning && this.crystalComboPhase == 0 && !this.oneShotRequested) { this.oneShotRunning = false; this.setEnabled(false); return; }
             if (this.tickStunSlam(p, target, distance)) {
                this.driving = true;
             } else {
@@ -502,7 +504,7 @@ public class AutoPvp extends Module {
                mc.field_1690.field_1903.method_23481(this.jump.get() && obstacle && p.method_24828() && this.clearAbove(p, 2));
                this.driving = true;
                this.updateShieldAxe(target);
-               if (this.attack.get() && !(distance > this.reach.get()) && p.method_6057(target) && !(p.method_7261(0.5F) < 0.95F)) {
+               if ((this.attack.get() || this.oneShotRequested) && !(distance > this.reach.get()) && p.method_6057(target) && !(p.method_7261(0.5F) < 0.95F)) {
                   if (this.shieldAxeSlot < 0) {
                      int swordSlot = InvUtil.findBestSword();
                      if (swordSlot < 0) {
@@ -512,7 +514,7 @@ public class AutoPvp extends Module {
                      InvUtil.select(swordSlot);
                   }
 
-                  if (this.crystalCombo.get()) {\n                     mc.field_1690.field_1867.method_23481(true);\n                     mc.field_1690.field_1894.method_23481(true);\n                  }\n                  mc.field_1761.method_2918(p, target);\n                  p.method_6104(class_1268.field_5808);\n                  if (this.crystalCombo.get() && InvUtil.findInventory(class_1802.field_8281) >= 0 && InvUtil.findInventory(class_1802.field_8301) >= 0) {\n                     this.crystalComboPhase = 1;\n                     this.crystalComboTicks = 0;\n                     this.crystalComboTargetId = target.method_5628();\n                     this.crystalComboBase = null;\n                  }\n                  if (this.doubleTap.get()) {
+                  if (this.crystalCombo.get()) {\n                     mc.field_1690.field_1867.method_23481(true);\n                     mc.field_1690.field_1894.method_23481(true);\n                  }\n                  mc.field_1761.method_2918(p, target);\n                  p.method_6104(class_1268.field_5808);\n                  if ((this.crystalCombo.get() || this.oneShotRunning) && InvUtil.findInventory(class_1802.field_8281) >= 0 && InvUtil.findInventory(class_1802.field_8301) >= 0) {\n                     this.crystalComboPhase = 1;\n                     this.crystalComboTicks = 0;\n                     this.crystalComboTargetId = target.method_5628();\n                     this.crystalComboBase = null;\n                     this.oneShotRequested = false;\n                  }\n                  if (this.doubleTap.get()) {
                      if (this.dtapPending) {
                         this.clearDoubleTap();
                      } else {
