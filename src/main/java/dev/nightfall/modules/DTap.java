@@ -22,8 +22,10 @@ import net.minecraft.class_746;
 
 public class DTap extends Module {
    private final NumberSetting targetRange = this.add(new NumberSetting("Ziel-Reichweite", 6.0, 3.0, 12.0, 0.5));
+   private final NumberSetting hitDelay = this.add(new NumberSetting("Delay nach Schwerttreffer (Ticks)", 0.0, 0.0, 40.0, 1.0));
    private int phase;
    private int ticks;
+   private int hitDelayTicks;
    private int targetId = -1;
    private class_2338 firstBase;
    private class_2338 secondBase;
@@ -46,6 +48,7 @@ public class DTap extends Module {
    private void reset() {
       phase = 0;
       ticks = 0;
+      hitDelayTicks = 0;
       targetId = -1;
       firstBase = null;
       secondBase = null;
@@ -177,12 +180,19 @@ public class DTap extends Module {
          targetId = target.method_5628();
          phase = 1;
          ticks = 0;
+         hitDelayTicks = hitDelay.getInt();
          return;
       }
 
       class_1657 target = CombatUtil.nearestPlayer(targetRange.get());
       if (target == null || target.method_5628() != targetId || !target.method_5805() || ++ticks > 220) {
          this.setEnabled(false);
+         return;
+      }
+
+      // Wait the configured number of ticks after the detected sword hit before placing obsidian/crystals.
+      if (hitDelayTicks > 0) {
+         hitDelayTicks--;
          return;
       }
 
