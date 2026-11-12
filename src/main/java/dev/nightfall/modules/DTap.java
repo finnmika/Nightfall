@@ -144,12 +144,25 @@ public class DTap extends Module {
       if (player == null || mc.field_1687 == null || mc.field_1761 == null || mc.field_1755 != null) return;
       if (phase == 0) {
          class_1657 target = CombatUtil.nearestPlayer(targetRange.get());
-         if (target == null || target.method_24828()) return;
-         if (InvUtil.findInventory(class_1802.field_8281) < 2 || InvUtil.findInventory(class_1802.field_8301) < 2) return;
-         class_2338[] bases = findBases(player, target);
-         if (bases == null) return;
-         firstBase = bases[0];
-         secondBase = bases[1];
+         if (target == null) {
+            trackedTargetId = -1;
+            lastTargetHealth = Float.NaN;
+            return;
+         }
+         if (trackedTargetId != target.method_5628()) {
+            trackedTargetId = target.method_5628();
+            lastTargetHealth = target.method_6032();
+            return;
+         }
+         float health = target.method_6032();
+         boolean wasHit = !Float.isNaN(lastTargetHealth) && health < lastTargetHealth - 0.01F;
+         lastTargetHealth = health;
+         if (!wasHit) return;
+         if (InvUtil.findInventory(class_1802.field_8281) < 1 || InvUtil.findInventory(class_1802.field_8301) < 2) return;
+         firstBase = findSideBase(player, target);
+         if (firstBase == null) return;
+         // Both crystals are placed sequentially on the same side-positioned obsidian.
+         secondBase = firstBase;
          targetId = target.method_5628();
          phase = 1;
          ticks = 0;
@@ -170,20 +183,16 @@ public class DTap extends Module {
             if (placeObsidian(player, secondBase)) { phase = 3; ticks = 0; }
             break;
          case 3:
-            if (!target.method_24828()) {
-               if (findCrystal(firstBase) == null) placeCrystal(player, firstBase);
-               if (findCrystal(firstBase) != null) { phase = 4; ticks = 0; }
-            }
+            if (findCrystal(firstBase) == null) placeCrystal(player, firstBase);
+            if (findCrystal(firstBase) != null) { phase = 4; ticks = 0; }
             break;
          case 4:
             attackCrystal(player, firstBase);
             if (findCrystal(firstBase) == null && ticks > 0) { phase = 5; ticks = 0; }
             break;
          case 5:
-            if (!target.method_24828()) {
-               if (findCrystal(secondBase) == null) placeCrystal(player, secondBase);
-               if (findCrystal(secondBase) != null) { phase = 6; ticks = 0; }
-            }
+            if (findCrystal(secondBase) == null) placeCrystal(player, secondBase);
+            if (findCrystal(secondBase) != null) { phase = 6; ticks = 0; }
             break;
          case 6:
             attackCrystal(player, secondBase);
