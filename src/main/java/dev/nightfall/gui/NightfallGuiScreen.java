@@ -60,6 +60,7 @@ public final class NightfallGuiScreen extends class_437 {
    private int numberSliderX;
    private int numberSliderW;
    private ColorSetting editingColor;
+   private ColorSetting colorSlider;
    private StringSetting editingString;
    private MessageListSetting editingMessages;
    private ListSetting editingList;
@@ -539,10 +540,16 @@ public final class NightfallGuiScreen extends class_437 {
             this.applyHue();
          } else if (this.slider.equals("blur")) {
             Config.blurStrength = Math.round(t * 150.0F);
+         } else if (this.slider.equals("espColor")) {
+            this.updateEspColorSlider(mx);
          }
       }
 
       if (!left) {
+         if (this.slider.equals("espColor")) {
+            Config.save();
+            this.colorSlider = null;
+         }
          this.slider = "";
       }
 
@@ -966,9 +973,25 @@ public final class NightfallGuiScreen extends class_437 {
          }
       } else if (s instanceof ColorSetting c) {
          ctx.method_51433(mc.field_1772, c.getName(), x + 5, y + 7, Theme.TEXT_DIM, false);
-         ctx.method_25294(x + w - 42, y + 5, x + w - 24, y + 18, 0xFF000000 | c.rgb());
-         ctx.method_51433(mc.field_1772, "HEX", x + w - 21, y + 7, Theme.ACCENT, false);
-         if (click && over) {
+         int trackX = x + 88;
+         int trackW = Math.max(28, w - 138);
+         float[] hsv = java.awt.Color.RGBtoHSB((c.rgb() >> 16) & 255, (c.rgb() >> 8) & 255, c.rgb() & 255, null);
+         for (int i = 0; i < 36; i++) {
+            int sx = trackX + i * trackW / 36;
+            int ex = trackX + (i + 1) * trackW / 36;
+            int hueColor = java.awt.Color.HSBtoRGB(i / 36.0F, Math.max(0.75F, hsv[1]), Math.max(0.85F, hsv[2]));
+            ctx.method_25294(sx, y + 16, Math.max(sx + 1, ex), y + 20, hueColor | 0xFF000000);
+         }
+         int knobX = trackX + Math.round(hsv[0] * trackW);
+         ctx.method_25294(knobX - 2, y + 14, knobX + 3, y + 22, -1);
+         ctx.method_25294(x + w - 38, y + 5, x + w - 24, y + 18, 0xFF000000 | c.rgb());
+         if (click && over && my >= y + 13 && mx >= trackX - 5 && mx <= trackX + trackW + 5) {
+            this.slider = "espColor";
+            this.sliderX = trackX;
+            this.sliderW = trackW;
+            this.colorSlider = c;
+            this.updateEspColorSlider(mx);
+         } else if (click && over) {
             try {
                ModuleManager.get(GUITheme.class).prepareColorEdit(c);
             } catch (Throwable var29) {
@@ -1165,6 +1188,14 @@ public final class NightfallGuiScreen extends class_437 {
       }
    }
 
+   private void updateEspColorSlider(int mx) {
+      if (this.colorSlider == null) return;
+      float t = Math.max(0.0F, Math.min(1.0F, (float)(mx - this.sliderX) / Math.max(1, this.sliderW)));
+      int rgb = this.colorSlider.rgb();
+      float[] hsv = java.awt.Color.RGBtoHSB((rgb >> 16) & 255, (rgb >> 8) & 255, rgb & 255, null);
+      this.colorSlider.set(java.awt.Color.HSBtoRGB(t, Math.max(0.75F, hsv[1]), Math.max(0.85F, hsv[2])) & 0xFFFFFF);
+   }
+
    private void updateConfigSlider(int mx, boolean active, boolean release) {
       if (this.slider.isEmpty()) return;
       float t = Math.max(0.0F, Math.min(1.0F, (float)(mx - this.sliderX) / Math.max(1, this.sliderW)));
@@ -1176,9 +1207,11 @@ public final class NightfallGuiScreen extends class_437 {
          case "radius" -> Config.cornerRadius = 10 + Math.round(t * 22);
          case "scale" -> Config.guiScalePercent = 70 + Math.round(t * 30);
          case "margin" -> Config.guiEdgeMargin = Math.round(t * 60);
+         case "espColor" -> this.updateEspColorSlider(mx);
       }
       if (release) {
          Config.save();
+         if (this.slider.equals("espColor")) this.colorSlider = null;
          this.slider = "";
       }
    }
