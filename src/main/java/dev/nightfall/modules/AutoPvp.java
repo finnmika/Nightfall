@@ -387,6 +387,22 @@ public class AutoPvp extends Module {
          this.crystalComboTicks = 0;
       }
 
+      if (this.crystalComboPhase == 3) {
+         boolean crystalStillThere = false;
+         for (class_1297 entity : mc.field_1687.method_18112()) {
+            if (entity instanceof class_1511 crystal && crystal.method_5805()
+               && crystal.method_19538().method_1022(new class_243(this.crystalComboBase.method_10263() + 0.5,
+                  this.crystalComboBase.method_10264() + 1.0, this.crystalComboBase.method_10260() + 0.5)) < 1.5) {
+               crystalStillThere = true;
+               break;
+            }
+         }
+         if (!crystalStillThere) {
+            this.crystalComboPhase = 4;
+            this.crystalComboTicks = 0;
+         }
+         return true;
+      }
       if (this.crystalComboPhase == 2 || this.crystalComboPhase == 4) {
          boolean existing = false;
          for (class_1297 entity : mc.field_1687.method_18112()) {
