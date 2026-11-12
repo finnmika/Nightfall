@@ -9,6 +9,7 @@ import net.minecraft.class_1268;
 import net.minecraft.class_1297;
 import net.minecraft.class_1511;
 import net.minecraft.class_1657;
+import net.minecraft.class_1792;
 import net.minecraft.class_1802;
 import net.minecraft.class_2246;
 import net.minecraft.class_2338;
@@ -50,6 +51,15 @@ public class DTap extends Module {
       secondBase = null;
       trackedTargetId = -1;
       lastTargetHealth = Float.NaN;
+   }
+
+   private int countInventory(class_746 player, class_1792 item) {
+      int count = 0;
+      for (int i = 0; i < 36; i++) {
+         net.minecraft.class_1799 stack = player.method_31548().method_5438(i);
+         if (stack.method_31574(item)) count += stack.method_7947();
+      }
+      return count;
    }
 
    private boolean entityFree(class_2338 pos, double minY, double maxY) {
@@ -158,7 +168,8 @@ public class DTap extends Module {
          boolean wasHit = !Float.isNaN(lastTargetHealth) && health < lastTargetHealth - 0.01F;
          lastTargetHealth = health;
          if (!wasHit) return;
-         if (InvUtil.findInventory(class_1802.field_8281) < 1 || InvUtil.findInventory(class_1802.field_8301) < 2) return;
+         // findInventory() returns a SLOT INDEX, not an item count. Count actual stack contents.
+         if (countInventory(player, class_1802.field_8281) < 1 || countInventory(player, class_1802.field_8301) < 2) return;
          firstBase = findSideBase(player, target);
          if (firstBase == null) return;
          // Both crystals are placed sequentially on the same side-positioned obsidian.
