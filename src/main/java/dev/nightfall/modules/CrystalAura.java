@@ -29,6 +29,9 @@ public class CrystalAura extends Module {
    private final BoolSetting place = this.add(new BoolSetting("Platzieren", true));
    private final BoolSetting breakC = this.add(new BoolSetting("Zerstoeren", true));
    private final BoolSetting autoSwitch = this.add(new BoolSetting("Auto-Switch", true));
+   private final BoolSetting placeObsidianOnHit = this.add(new BoolSetting("Obsidian bei Treffer", true));
+   private int trackedTargetId = -1;
+   private float lastTargetHealth = Float.NaN;
    private int placeT;
    private int breakT;
 
@@ -36,16 +39,65 @@ public class CrystalAura extends Module {
    public void onWorldLeave() {
       this.placeT = 0;
       this.breakT = 0;
+      this.trackedTargetId = -1;
+      this.lastTargetHealth = Float.NaN;
    }
 
    @Override
    protected void onDisable() {
       this.placeT = 0;
       this.breakT = 0;
+      this.trackedTargetId = -1;
+      this.lastTargetHealth = Float.NaN;
    }
 
    public CrystalAura() {
       super("CrystalAura", "Platziert und zerstoert End Crystals.", Category.COMBAT);
+   }
+
+
+   private class_2338 findHitObsidianBase(class_746 player, class_1657 target) {
+      double dx = target.method_23317() - player.method_23317();
+      double dz = target.method_23321() - player.method_23321();
+      int forwardX = Math.abs(dx) >= Math.abs(dz) ? (dx >= 0 ? 1 : -1) : 0;
+      int forwardZ = forwardX == 0 ? (dz >= 0 ? 1 : -1) : 0;
+      int sideX = -forwardZ;
+      int sideZ = forwardX;
+      class_2338 feet = target.method_24515();
+      class_2338[] candidates = new class_2338[] {
+         feet.method_10069(sideX * 2, -1, sideZ * 2),
+         feet.method_10069(-sideX * 2, -1, -sideZ * 2),
+         feet.method_10069(forwardX * 2, -1, forwardZ * 2),
+         feet.method_10069(-forwardX * 2, -1, -forwardZ * 2)
+      };
+      for (class_2338 base : candidates) {
+         class_2680 state = mc.field_1687.method_8320(base);
+         class_2338 support = base.method_10074();
+         if (!state.method_45474()) continue;
+         if (mc.field_1687.method_8320(support).method_26220(mc.field_1687, support).method_1110()) continue;
+         if (!mc.field_1687.method_8320(base.method_10084()).method_26215()
+            || !mc.field_1687.method_8320(base.method_10084().method_10084()).method_26215()) continue;
+         class_238 space = new class_238(base.method_10263(), base.method_10264(),
+            base.method_10260(), base.method_10263() + 1.0, base.method_10264() + 3.0,
+            base.method_10260() + 1.0);
+         if (!mc.field_1687.method_8335(null, space).isEmpty()) continue;
+         return base;
+      }
+      return null;
+   }
+
+   private void placeObsidianAfterHit(class_746 player, class_1657 target) {
+      if (!this.placeObsidianOnHit.get()) return;
+      class_2338 base = findHitObsidianBase(player, target);
+      if (base == null) return;
+      int slot = InvUtil.ensureHotbar(class_1802.field_8281);
+      if (slot < 0) return;
+      class_2338 support = base.method_10074();
+      InvUtil.select(slot);
+      class_243 hit = class_243.method_24953(support).method_1031(0.5, 1.0, 0.5);
+      mc.field_1761.method_2896(player, class_1268.field_5808,
+         new class_3965(hit, class_2350.field_11036, support, false));
+      player.method_6104(class_1268.field_5808);
    }
 
    @Override
@@ -84,6 +136,22 @@ public class CrystalAura extends Module {
 
          if (this.place.get() && this.placeT <= 0) {
             class_1657 target = CombatUtil.nearestPlayer(this.targetRange.get());
+            if (target == null) {
+               this.trackedTargetId = -1;
+               this.lastTargetHealth = Float.NaN;
+            } else {
+               int currentTargetId = target.method_5628();
+               float currentHealth = target.method_6032();
+               if (currentTargetId != this.trackedTargetId) {
+                  this.trackedTargetId = currentTargetId;
+                  this.lastTargetHealth = currentHealth;
+               } else {
+                  boolean targetWasHit = !Float.isNaN(this.lastTargetHealth)
+                     && currentHealth < this.lastTargetHealth - 0.01F;
+                  this.lastTargetHealth = currentHealth;
+                  if (targetWasHit) this.placeObsidianAfterHit(p, target);
+               }
+            }
             if (target != null && !target.method_24828()) {
                class_1268 hand = p.method_6079().method_31574(class_1802.field_8301)
                   ? class_1268.field_5810
