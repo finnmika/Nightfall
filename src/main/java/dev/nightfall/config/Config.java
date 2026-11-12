@@ -31,6 +31,9 @@ public final class Config {
    public static int gridSize = 4;
    public static float accentHue = 174.0F;
    public static int blurStrength = 72;
+   public static int guiTransparency = 82;
+   public static int borderSize = 2;
+   public static int cornerRadius = 14;
    public static String categoryOrder = "Combat,Movement,Visuals,Player,World,Misc,HUD,Config";
    public static boolean guiAnimations = true;
    public static float guiAnimationSpeed = 1.0F;
@@ -60,6 +63,9 @@ public final class Config {
          root.addProperty("gridSize", gridSize);
          root.addProperty("accentHue", accentHue);
          root.addProperty("blurStrength", blurStrength);
+         root.addProperty("guiTransparency", guiTransparency);
+         root.addProperty("borderSize", borderSize);
+         root.addProperty("cornerRadius", cornerRadius);
          root.addProperty("categoryOrder", categoryOrder);
          root.addProperty("guiAnimations", guiAnimations);
          root.addProperty("guiAnimationSpeed", guiAnimationSpeed);
@@ -164,6 +170,15 @@ public final class Config {
                blurStrength = Math.max(0, Math.min(150, root.get("blurStrength").getAsInt()));
             }
 
+            if (root.has("guiTransparency")) {
+               guiTransparency = Math.max(35, Math.min(100, root.get("guiTransparency").getAsInt()));
+            }
+            if (root.has("borderSize")) {
+               borderSize = Math.max(1, Math.min(6, root.get("borderSize").getAsInt()));
+            }
+            if (root.has("cornerRadius")) {
+               cornerRadius = Math.max(4, Math.min(22, root.get("cornerRadius").getAsInt()));
+            }
             if (root.has("categoryOrder")) {
                categoryOrder = root.get("categoryOrder").getAsString();
             }
