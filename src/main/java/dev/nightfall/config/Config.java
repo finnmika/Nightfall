@@ -33,7 +33,7 @@ public final class Config {
    public static int blurStrength = 72;
    public static int guiTransparency = 82;
    public static int borderSize = 2;
-   public static int cornerRadius = 18;
+   public static int cornerRadius = 24;
    public static int guiScalePercent = 100;
    public static int guiEdgeMargin = 12;
    public static String categoryOrder = "Combat,Movement,Visuals,Player,World,Misc,HUD,Config";
@@ -175,13 +175,13 @@ public final class Config {
             }
 
             if (root.has("guiTransparency")) {
-               guiTransparency = Math.max(35, Math.min(100, root.get("guiTransparency").getAsInt()));
+               guiTransparency = Math.max(0, Math.min(100, root.get("guiTransparency").getAsInt()));
             }
             if (root.has("borderSize")) {
                borderSize = Math.max(1, Math.min(6, root.get("borderSize").getAsInt()));
             }
             if (root.has("cornerRadius")) {
-               cornerRadius = Math.max(4, Math.min(22, root.get("cornerRadius").getAsInt()));
+               cornerRadius = Math.max(10, Math.min(32, root.get("cornerRadius").getAsInt()));
             }
             if (root.has("guiScalePercent")) {
                guiScalePercent = Math.max(70, Math.min(100, root.get("guiScalePercent").getAsInt()));
