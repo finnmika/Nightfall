@@ -48,23 +48,29 @@ public class DTap extends Module {
       secondBase = null;
    }
 
+   private boolean entityFree(class_2338 pos, double minY, double maxY) {
+      class_238 box = new class_238(pos.method_10263(), pos.method_10264() + minY, pos.method_10260(),
+         pos.method_10263() + 1.0, pos.method_10264() + maxY, pos.method_10260() + 1.0);
+      return mc.field_1687.method_8335(null, box).isEmpty();
+   }
+
    private boolean validBase(class_2338 base) {
       class_2680 state = mc.field_1687.method_8320(base);
       class_2338 support = base.method_10074();
       if (!state.method_45474() || mc.field_1687.method_8320(support).method_26220(mc.field_1687, support).method_1110()) return false;
       if (!mc.field_1687.method_8320(base.method_10084()).method_26215()
          || !mc.field_1687.method_8320(base.method_10084().method_10084()).method_26215()) return false;
-      class_238 space = new class_238(base.method_10263(), base.method_10264() + 1, base.method_10260(),
-         base.method_10263() + 1, base.method_10264() + 3, base.method_10260() + 1);
-      return mc.field_1687.method_8335(null, space).isEmpty();
+      return entityFree(base, 0.0, 1.0) && entityFree(base, 1.0, 3.0);
    }
 
    private boolean usableBase(class_2338 base) {
-      if (mc.field_1687.method_8320(base).method_27852(class_2246.field_9987)) {
+      class_2680 state = mc.field_1687.method_8320(base);
+      if (state.method_27852(class_2246.field_9987)) {
          class_2338 support = base.method_10074();
          return !mc.field_1687.method_8320(support).method_26220(mc.field_1687, support).method_1110()
             && mc.field_1687.method_8320(base.method_10084()).method_26215()
-            && mc.field_1687.method_8320(base.method_10084().method_10084()).method_26215();
+            && mc.field_1687.method_8320(base.method_10084().method_10084()).method_26215()
+            && entityFree(base, 0.0, 1.0) && entityFree(base, 1.0, 3.0);
       }
       return validBase(base);
    }
@@ -79,14 +85,16 @@ public class DTap extends Module {
       for (int[] dir : directions) {
          class_2338 one = feet.method_10069(dir[0] * 2, -1, dir[1] * 2);
          class_2338 two = feet.method_10069(dir[0] * 4, -1, dir[1] * 2);
-         if (usableBase(one) && usableBase(two)
-            && player.method_5739(target) <= targetRange.get() + 3.0) return new class_2338[]{one, two};
+         if (usableBase(one) && usableBase(two) && player.method_5739(target) <= targetRange.get() + 3.0) {
+            return new class_2338[]{one, two};
+         }
       }
       return null;
    }
 
    private boolean placeObsidian(class_746 player, class_2338 base) {
       if (mc.field_1687.method_8320(base).method_27852(class_2246.field_9987)) return true;
+      if (!entityFree(base, 0.0, 1.0) || !entityFree(base, 1.0, 3.0)) return false;
       int slot = InvUtil.ensureHotbar(class_1802.field_8281);
       if (slot < 0) return false;
       class_2338 support = base.method_10074();
@@ -107,21 +115,24 @@ public class DTap extends Module {
       return null;
    }
 
-   private void placeAndBreak(class_746 player, class_2338 base, int nextPhase) {
+   private void placeCrystal(class_746 player, class_2338 base) {
+      int slot = InvUtil.ensureHotbar(class_1802.field_8301);
+      if (slot < 0) { this.setEnabled(false); return; }
+      InvUtil.select(slot);
+      class_243 hit = new class_243(base.method_10263() + 0.5, base.method_10264() + 1.0, base.method_10260() + 0.5);
+      mc.field_1761.method_2896(player, class_1268.field_5808, new class_3965(hit, class_2350.field_11036, base, false));
+      player.method_6104(class_1268.field_5808);
+   }
+
+   private void attackCrystal(class_746 player, class_2338 base) {
       class_1511 crystal = findCrystal(base);
       if (crystal == null) {
-         int slot = InvUtil.ensureHotbar(class_1802.field_8301);
-         if (slot < 0) { this.setEnabled(false); return; }
-         InvUtil.select(slot);
-         class_243 hit = new class_243(base.method_10263() + 0.5, base.method_10264() + 1.0, base.method_10260() + 0.5);
-         mc.field_1761.method_2896(player, class_1268.field_5808, new class_3965(hit, class_2350.field_11036, base, false));
-         player.method_6104(class_1268.field_5808);
-      } else {
-         mc.field_1761.method_2918(player, crystal);
-         player.method_6104(class_1268.field_5808);
-         this.phase = nextPhase;
-         this.ticks = 0;
+         if (++this.ticks > 12) this.setEnabled(false);
+         return;
       }
+      mc.field_1761.method_2918(player, crystal);
+      player.method_6104(class_1268.field_5808);
+      if (++this.ticks >= 3) this.ticks = 0;
    }
 
    @Override
@@ -139,35 +150,44 @@ public class DTap extends Module {
          targetId = target.method_5628();
          phase = 1;
          ticks = 0;
-      } else {
-         class_1657 target = CombatUtil.nearestPlayer(targetRange.get());
-         if (target == null || target.method_5628() != targetId || !target.method_5805() || ++ticks > 160) {
+         return;
+      }
+
+      class_1657 target = CombatUtil.nearestPlayer(targetRange.get());
+      if (target == null || target.method_5628() != targetId || !target.method_5805() || ++ticks > 220) {
+         this.setEnabled(false);
+         return;
+      }
+
+      switch (phase) {
+         case 1:
+            if (placeObsidian(player, firstBase)) { phase = 2; ticks = 0; }
+            break;
+         case 2:
+            if (placeObsidian(player, secondBase)) { phase = 3; ticks = 0; }
+            break;
+         case 3:
+            if (!target.method_24828()) {
+               if (findCrystal(firstBase) == null) placeCrystal(player, firstBase);
+               if (findCrystal(firstBase) != null) { phase = 4; ticks = 0; }
+            }
+            break;
+         case 4:
+            attackCrystal(player, firstBase);
+            if (findCrystal(firstBase) == null && ticks > 0) { phase = 5; ticks = 0; }
+            break;
+         case 5:
+            if (!target.method_24828()) {
+               if (findCrystal(secondBase) == null) placeCrystal(player, secondBase);
+               if (findCrystal(secondBase) != null) { phase = 6; ticks = 0; }
+            }
+            break;
+         case 6:
+            attackCrystal(player, secondBase);
+            if (findCrystal(secondBase) == null && ticks > 0) this.setEnabled(false);
+            break;
+         default:
             this.setEnabled(false);
-            return;
-         }
-         if (target.method_24828()) return;
-         switch (phase) {
-            case 1:
-               if (placeObsidian(player, firstBase)) phase = 2;
-               break;
-            case 2:
-               if (placeObsidian(player, secondBase)) phase = 3;
-               break;
-            case 3:
-               placeAndBreak(player, firstBase, 4);
-               break;
-            case 4:
-               if (findCrystal(firstBase) == null) phase = 5;
-               break;
-            case 5:
-               placeAndBreak(player, secondBase, 6);
-               break;
-            case 6:
-               if (findCrystal(secondBase) == null) this.setEnabled(false);
-               break;
-            default:
-               this.setEnabled(false);
-         }
       }
    }
 }
