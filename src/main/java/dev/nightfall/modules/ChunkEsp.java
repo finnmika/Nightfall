@@ -40,7 +40,12 @@ public final class ChunkEsp extends Module {
    private final BoolSetting showScore = this.add(new BoolSetting("Score anzeigen", true));
    private final BoolSetting showGone = this.add(new BoolSetting("SUS WEG anzeigen", true));
    private final BoolSetting showFavorites = this.add(new BoolSetting("Favoriten hervorheben", true));
-   private final NumberSetting maxObj = this.add(new NumberSetting("Max Regionen", 48.0, 4.0, 256.0, 4.0));
+   private final NumberSetting maxObj = this.add(new NumberSetting("Max Regionen", 32.0, 4.0, 256.0, 4.0));
+   private List<ChunkEsp.Region> cachedRegions = List.of();
+   private long lastRegionBuildNanos;
+   private int cachedPlayerChunkX = Integer.MIN_VALUE;
+   private int cachedPlayerChunkZ = Integer.MIN_VALUE;
+   private int cachedMarkCount = -1;
 
    public ChunkEsp() {
       super("ChunkESP", "Zeigt zusammengefasste SUS-Regionen und Favoriten.", Category.VISUALS);
@@ -125,7 +130,18 @@ public final class ChunkEsp extends Module {
          if (finder.isEnabled()) {
             int pcx = mc.field_1724.method_31477() >> 4;
             int pcz = mc.field_1724.method_31479() >> 4;
-            List<ChunkEsp.Region> regions = this.mergeAdjacent(finder.marks(), pcx, pcz, this.dist.getInt());
+            long now = System.nanoTime();
+            int markCount = finder.marks().size();
+            if (now - this.lastRegionBuildNanos >= 50_000_000L
+               || pcx != this.cachedPlayerChunkX || pcz != this.cachedPlayerChunkZ
+               || markCount != this.cachedMarkCount) {
+               this.cachedRegions = this.mergeAdjacent(finder.marks(), pcx, pcz, this.dist.getInt());
+               this.lastRegionBuildNanos = now;
+               this.cachedPlayerChunkX = pcx;
+               this.cachedPlayerChunkZ = pcz;
+               this.cachedMarkCount = markCount;
+            }
+            List<ChunkEsp.Region> regions = this.cachedRegions;
             double phase = System.currentTimeMillis() % 100000L / 1000.0 * this.speed.get();
             double pulse = 0.5 + 0.5 * Math.sin(phase * Math.PI * 2.0);
             double py = Math.floor(mc.field_1724.method_23318());
@@ -175,7 +191,7 @@ public final class ChunkEsp extends Module {
                         box = new class_238(x0, y0, z0, x1, y0 + h, z1);
                   }
 
-                  if (Draw.box(ctx, box, Theme.withAlpha(color, alpha), this.thick.getInt(), true)) {
+                  if (Draw.box(ctx, box, Theme.withAlpha(color, alpha), this.thick.getInt(), true, false)) {
                      label = (r.favorite && this.showFavorites.get() ? "★ " : "")
                         + (r.status == ChunkResult.Status.GONE ? "SUS WEG" : "SUS")
                         + (r.count > 1 ? " · " + r.count + " Chunks" : "")
