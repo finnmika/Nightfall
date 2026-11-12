@@ -93,13 +93,23 @@ public class CrystalAura extends Module {
       if (mc.field_1687.method_8320(base).method_27852(class_2246.field_9987)) return true;
       int slot = InvUtil.ensureHotbar(class_1802.field_8281);
       if (slot < 0) return false;
-      class_2338 support = base.method_10074();
       InvUtil.select(slot);
-      class_243 hit = class_243.method_24953(support).method_1031(0.5, 1.0, 0.5);
-      mc.field_1761.method_2896(player, class_1268.field_5808,
-         new class_3965(hit, class_2350.field_11036, support, false));
-      player.method_6104(class_1268.field_5808);
-      return true;
+      // Place against any valid neighboring solid face. This is more reliable than
+      // assuming the block below is the only usable support/face.
+      for (class_2350 face : class_2350.values()) {
+         class_2338 neighbor = base.method_10093(face);
+         if (!mc.field_1687.method_8320(neighbor).method_26215()) {
+            class_2350 clickedSide = face.method_10153();
+            class_243 hit = class_243.method_24953(neighbor)
+               .method_1031(clickedSide.method_10148() * 0.5, clickedSide.method_10164() * 0.5, clickedSide.method_10165() * 0.5);
+            class_3965 result = new class_3965(hit, clickedSide, neighbor, false);
+            if (mc.field_1761.method_2896(player, class_1268.field_5808, result).method_23665()) {
+               player.method_6104(class_1268.field_5808);
+               return true;
+            }
+         }
+      }
+      return false;
    }
 
    @Override
