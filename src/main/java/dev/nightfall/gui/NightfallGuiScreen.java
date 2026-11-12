@@ -1050,7 +1050,7 @@ public final class NightfallGuiScreen extends class_437 {
          Theme.ACCENT,
          false
       );
-      this.drawConfigSlider(ctx, mc, "Transparenz", Config.guiTransparency + "%", "transparency", x + 10, y + 262, w - 20, Config.guiTransparency / 100.0F);
+      this.drawConfigSlider(ctx, mc, "Transparenz", Config.guiTransparency + "%", "transparency", x + 10, y + 248, w - 20, Config.guiTransparency / 100.0F);
       this.drawConfigSlider(ctx, mc, "Randgröße", Config.borderSize + " px", "border", x + 10, y + 300, w - 20, (Config.borderSize - 1) / 5.0F);
       this.drawConfigSlider(ctx, mc, "Rundungen", Config.cornerRadius + " px", "radius", x + 10, y + 338, w - 20, (Config.cornerRadius - 10) / 22.0F);
       this.drawConfigSlider(ctx, mc, "Menügröße", Config.guiScalePercent + "%", "scale", x + 10, y + 376, w - 20, (Config.guiScalePercent - 70) / 30.0F);
@@ -1094,7 +1094,7 @@ public final class NightfallGuiScreen extends class_437 {
          Config.guiAnimationSpeed = Config.guiAnimationSpeed >= 5.0F ? 0.1F : Math.min(5.0F, Config.guiAnimationSpeed + 0.1F);
       }
 
-      this.beginConfigSlider(click, mx, my, x + 10, y + 276, w - 20, "transparency");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 262, w - 20, "transparency");
       this.beginConfigSlider(click, mx, my, x + 10, y + 314, w - 20, "border");
       this.beginConfigSlider(click, mx, my, x + 10, y + 352, w - 20, "radius");
       this.beginConfigSlider(click, mx, my, x + 10, y + 390, w - 20, "scale");
