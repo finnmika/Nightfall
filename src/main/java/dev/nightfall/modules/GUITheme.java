@@ -111,8 +111,8 @@ public final class GUITheme extends Module {
             this.dimText.set(10132142);
       }
 
-      float[] hue = Color.RGBtoHSB(this.accent.rgb() >> 16 & 0xFF, this.accent.rgb() >> 8 & 0xFF, this.accent.rgb() & 0xFF, null);
-      Config.accentHue = hue[0] * 360.0F;
+      float[] hsb = Color.RGBtoHSB(this.accent.rgb() >> 16 & 0xFF, this.accent.rgb() >> 8 & 0xFF, this.accent.rgb() & 0xFF, null);
+      Config.accentHue = hsb[0] * 360.0F;
       Theme.apply(this.accent.rgb(), this.secondary.rgb(), this.panel.rgb(), this.text.rgb(), this.dimText.rgb(), this.overlay.rgb(), this.design.get());
    }
 }
