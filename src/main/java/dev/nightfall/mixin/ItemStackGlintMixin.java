@@ -17,7 +17,7 @@ public abstract class ItemStackGlintMixin {
    )
    private void nightfall$forceItemGlint(CallbackInfoReturnable<Boolean> cir) {
       try {
-         class_1799 stack = (class_1799)this;
+         class_1799 stack = (class_1799)(Object)this;
          if (ModuleManager.get(ItemGlint.class).forceGlint(stack)) {
             cir.setReturnValue(true);
          }
