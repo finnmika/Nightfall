@@ -18,7 +18,7 @@ abstract class SlowSwingMixin {
    )
    private void nightfall$slowLocalSwing(CallbackInfoReturnable<Integer> cir) {
       class_310 client = class_310.method_1551();
-      if (client.field_1724 == this) {
+      if (client.field_1724 == (class_1309)(Object)this) {
          try {
             SlowSwing module = ModuleManager.get(SlowSwing.class);
             if (module.isEnabled()) {
