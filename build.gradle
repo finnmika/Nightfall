@@ -17,7 +17,8 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
+    // Source files use Fabric intermediary names (class_332, class_310, etc.).
+    // Keep Minecraft on the intermediary namespace instead of applying Mojang names.
     modImplementation "net.fabricmc:fabric-loader:${loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 }
