@@ -83,6 +83,9 @@ public class AutoPvp extends Module {
 
    @Override
    protected void onDisable() {
+      this.oneShotRequested = false;
+      this.oneShotRunning = false;
+      this.resetCrystalCombo();
       this.clearDoubleTap();
       this.resetCrystalCombo();
       this.cancelSlam(true);
@@ -360,7 +363,7 @@ public class AutoPvp extends Module {
    }
 
    private boolean tickCrystalCombo(class_746 p, class_1657 target) {
-      if (!this.crystalCombo.get()) {
+      if (!this.crystalCombo.get() && !this.oneShotRunning) {
          this.resetCrystalCombo();
          return false;
       }
@@ -472,6 +475,7 @@ public class AutoPvp extends Module {
          class_1657 target = CombatUtil.nearestPlayer(this.follow.get());
          if (target == null) {
             this.clearDoubleTap();
+            if (this.oneShotRunning) { this.oneShotRunning = false; this.oneShotRequested = false; this.resetCrystalCombo(); this.setEnabled(false); return; }
             this.resetCrystalCombo();
             this.cancelSlam(true);
             this.releaseShieldAxe();
@@ -528,7 +532,7 @@ public class AutoPvp extends Module {
                      InvUtil.select(swordSlot);
                   }
 
-                  if (this.crystalCombo.get()) {
+                  if (this.crystalCombo.get() || this.oneShotRunning) {
                      mc.field_1690.field_1867.method_23481(true);
                      mc.field_1690.field_1894.method_23481(true);
                   }
