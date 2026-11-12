@@ -51,15 +51,20 @@ public abstract class EspBase extends Module {
    }
 
    protected void drawTarget(class_332 ctx, class_238 box, String label, int rgb) {
+      this.drawTarget(ctx, box, label, rgb, 0.0, 0.0, 0.0);
+   }
+
+   protected void drawTarget(class_332 ctx, class_238 box, String label, int rgb, double offsetX, double offsetY, double offsetZ) {
       if (Projection.valid()) {
          BaseFinder baseFinder = ModuleManager.get(BaseFinder.class);
          if (baseFinder == null
             || !baseFinder.isFakeChunk(
-               (int)Math.floor((box.field_1323 + box.field_1320) / 2.0) >> 4, (int)Math.floor((box.field_1321 + box.field_1324) / 2.0) >> 4
+               (int)Math.floor((box.field_1323 + box.field_1320) / 2.0 + offsetX) >> 4,
+               (int)Math.floor((box.field_1321 + box.field_1324) / 2.0 + offsetZ) >> 4
             )) {
-            double cx = (box.field_1323 + box.field_1320) / 2.0;
-            double cy = (box.field_1322 + box.field_1325) / 2.0;
-            double cz = (box.field_1321 + box.field_1324) / 2.0;
+            double cx = (box.field_1323 + box.field_1320) / 2.0 + offsetX;
+            double cy = (box.field_1322 + box.field_1325) / 2.0 + offsetY;
+            double cz = (box.field_1321 + box.field_1324) / 2.0 + offsetZ;
             double fade = 1.0;
             if (this.distanceFade.get() && mc.field_1724 != null && this.range.get() > 0.0) {
                double dx = cx - Projection.eyeX();
@@ -74,7 +79,10 @@ public abstract class EspBase extends Module {
             int col = this.argb(rgb, fade);
             boolean shown = false;
             if (!this.style.is("Aus") && fade > 0.005) {
-               shown = Draw.box(ctx, box, col, this.thickness.getInt(), this.style.is("3D"), this.smoothing.get());
+               shown = Draw.box(ctx,
+                  box.field_1323 + offsetX, box.field_1322 + offsetY, box.field_1321 + offsetZ,
+                  box.field_1320 + offsetX, box.field_1325 + offsetY, box.field_1324 + offsetZ,
+                  col, this.thickness.getInt(), this.style.is("3D"), this.smoothing.get());
             }
 
             boolean centerOk = Projection.project(cx, cy, cz, this.pt);
