@@ -28,8 +28,6 @@ public class AutoPvp extends Module {
    private final NumberSetting turnSpeed = this.add(new NumberSetting("Drehgeschwindigkeit", 16.0, 3.0, 35.0, 1.0));
    private final BoolSetting smoothLook = this.add(new BoolSetting("Smooth Rotation", true));
    private final BoolSetting attack = this.add(new BoolSetting("Angreifen", true));
-   private final BoolSetting doubleTap = this.add(new BoolSetting("Double Tap (DTap)", false));
-   private final NumberSetting doubleTapWindow = this.add(new NumberSetting("DTap-Zeitfenster (Ticks)", 18.0, 6.0, 40.0, 1.0));
    private final BoolSetting strafe = this.add(new BoolSetting("Strafen", true));
    private final BoolSetting jump = this.add(new BoolSetting("Springen bei Hindernis", true));
    private final BoolSetting useStunSlam = this.add(new BoolSetting("Stun-Slam (Windcharge -> Mace)", true));
@@ -44,8 +42,6 @@ public class AutoPvp extends Module {
    private int crystalComboTicks;
    private int crystalComboTargetId = -1;
    private class_2338 crystalComboBase;
-   private boolean oneShotRequested;
-   private boolean oneShotRunning;
    private boolean driving;
    private boolean wasForward;
    private boolean wasSprint;
@@ -59,9 +55,6 @@ public class AutoPvp extends Module {
    private boolean ownsMaceAssist;
    private int strafeDir = 1;
    private int strafeTimer;
-   private boolean dtapPending;
-   private int dtapTargetId = -1;
-   private int dtapTicks;
    private int shieldPreviousSlot = -1;
    private int shieldAxeSlot = -1;
    private int shieldTargetId = -1;
@@ -83,10 +76,6 @@ public class AutoPvp extends Module {
 
    @Override
    protected void onDisable() {
-      this.oneShotRequested = false;
-      this.oneShotRunning = false;
-      this.resetCrystalCombo();
-      this.clearDoubleTap();
       this.resetCrystalCombo();
       this.cancelSlam(true);
       this.releaseShieldAxe();
@@ -138,23 +127,11 @@ public class AutoPvp extends Module {
       }
    }
 
-   public void triggerDTab() {
-      this.oneShotRequested = true;
-      this.oneShotRunning = true;
-      if (!this.isEnabled()) this.setEnabled(true);
-   }
-
    private void resetCrystalCombo() {
       this.crystalComboPhase = 0;
       this.crystalComboTicks = 0;
       this.crystalComboTargetId = -1;
       this.crystalComboBase = null;
-   }
-
-   private void clearDoubleTap() {
-      this.dtapPending = false;
-      this.dtapTargetId = -1;
-      this.dtapTicks = 0;
    }
 
    private void releaseShieldAxe() {
@@ -363,18 +340,19 @@ public class AutoPvp extends Module {
    }
 
    private boolean tickCrystalCombo(class_746 p, class_1657 target) {
-      if (!this.crystalCombo.get() && !this.oneShotRunning) {
+      if (!this.crystalCombo.get()) {
          this.resetCrystalCombo();
          return false;
       }
       if (this.crystalComboPhase == 0) return false;
-      if (target == null || !target.method_5805() || target.method_5628() != this.crystalComboTargetId || this.crystalComboTicks++ > 80) {
+      if (target == null || !target.method_5805() || target.method_5628() != this.crystalComboTargetId || this.crystalComboTicks++ > 200) {
          this.resetCrystalCombo();
          return false;
       }
 
       class_1268 main = class_1268.field_5808;
       if (this.crystalComboPhase == 1) {
+         if (target.method_24828()) return true;
          if (this.crystalComboBase == null) {
             class_2338 feet = target.method_24515();
             double dx = target.method_23317() - p.method_23317();
@@ -458,7 +436,6 @@ public class AutoPvp extends Module {
 
    @Override
    public void onWorldLeave() {
-      this.clearDoubleTap();
       this.cancelSlam(true);
       this.releaseShieldAxe();
       this.release();
@@ -474,19 +451,11 @@ public class AutoPvp extends Module {
       if (p != null && mc.field_1755 == null && mc.field_1761 != null && mc.field_1687 != null) {
          class_1657 target = CombatUtil.nearestPlayer(this.follow.get());
          if (target == null) {
-            this.clearDoubleTap();
-            if (this.oneShotRunning) { this.oneShotRunning = false; this.oneShotRequested = false; this.resetCrystalCombo(); this.setEnabled(false); return; }
             this.resetCrystalCombo();
             this.cancelSlam(true);
             this.releaseShieldAxe();
             this.release();
          } else {
-            if (!this.doubleTap.get()) {
-               this.clearDoubleTap();
-            } else if (this.dtapPending && (this.dtapTargetId != target.method_5628() || this.dtapTicks-- <= 0)) {
-               this.clearDoubleTap();
-            }
-
             if (!this.driving) {
                this.wasForward = mc.field_1690.field_1894.method_1434();
                this.wasSprint = mc.field_1690.field_1867.method_1434();
@@ -498,7 +467,6 @@ public class AutoPvp extends Module {
             this.aimAt(target.method_23317(), target.method_23323(0.5), target.method_23321());
             double distance = p.method_5739(target);
             if (this.tickCrystalCombo(p, target)) { this.driving = true; return; }
-            if (this.oneShotRunning && this.crystalComboPhase == 0 && !this.oneShotRequested) { this.oneShotRunning = false; this.setEnabled(false); return; }
             if (this.tickStunSlam(p, target, distance)) {
                this.driving = true;
             } else {
@@ -522,7 +490,7 @@ public class AutoPvp extends Module {
                mc.field_1690.field_1903.method_23481(this.jump.get() && obstacle && p.method_24828() && this.clearAbove(p, 2));
                this.driving = true;
                this.updateShieldAxe(target);
-               if ((this.attack.get() || this.oneShotRequested) && !(distance > this.reach.get()) && p.method_6057(target) && !(p.method_7261(0.5F) < 0.95F)) {
+               if (this.attack.get() && !(distance > this.reach.get()) && p.method_6057(target) && !(p.method_7261(0.5F) < 0.95F)) {
                   if (this.shieldAxeSlot < 0) {
                      int swordSlot = InvUtil.findBestSword();
                      if (swordSlot < 0) {
@@ -532,29 +500,17 @@ public class AutoPvp extends Module {
                      InvUtil.select(swordSlot);
                   }
 
-                  if (this.crystalCombo.get() || this.oneShotRunning) {
+                  if (this.crystalCombo.get()) {
                      mc.field_1690.field_1867.method_23481(true);
                      mc.field_1690.field_1894.method_23481(true);
                   }
                   mc.field_1761.method_2918(p, target);
                   p.method_6104(class_1268.field_5808);
-                  if ((this.crystalCombo.get() || this.oneShotRunning) && InvUtil.findInventory(class_1802.field_8281) >= 0 && InvUtil.findInventory(class_1802.field_8301) >= 0) {
+                  if (this.crystalCombo.get() && InvUtil.findInventory(class_1802.field_8281) >= 0 && InvUtil.findInventory(class_1802.field_8301) >= 0) {
                      this.crystalComboPhase = 1;
                      this.crystalComboTicks = 0;
                      this.crystalComboTargetId = target.method_5628();
                      this.crystalComboBase = null;
-                     this.oneShotRequested = false;
-                  }
-                  if (this.doubleTap.get()) {
-                     if (this.dtapPending) {
-                        this.clearDoubleTap();
-                     } else {
-                        this.dtapPending = true;
-                        this.dtapTargetId = target.method_5628();
-                        this.dtapTicks = this.doubleTapWindow.getInt();
-                     }
-                  } else {
-                     this.clearDoubleTap();
                   }
                }
             }
