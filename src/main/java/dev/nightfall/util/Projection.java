@@ -84,7 +84,7 @@ public final class Projection {
                viewProjection = projection.mul(view);
                sw = width;
                sh = height;
-               tickDelta = frameTickDelta;
+               tickDelta = Math.max(0.0F, Math.min(1.0F, frameTickDelta));
                valid = Double.isFinite(ex) && Double.isFinite(ey) && Double.isFinite(ez);
             }
          }
