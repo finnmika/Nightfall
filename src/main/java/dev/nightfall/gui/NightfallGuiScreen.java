@@ -730,7 +730,7 @@ public final class NightfallGuiScreen extends class_437 {
 
       int availableBody = Math.max(64, this.field_22790 - y - 25 - 12);
       if (tab.equals("Config")) availableBody = Math.max(availableBody, this.field_22790 - y - 36);
-      if (this.field_22789 >= 720 && this.field_22790 >= 400) {
+      if (!tab.equals("Config") && this.field_22789 >= 720 && this.field_22790 >= 400) {
          availableBody = Math.min(availableBody, Math.max(82, this.field_22790 / 2 - 48));
       }
       int bodyH = this.pMinimized(tab)
