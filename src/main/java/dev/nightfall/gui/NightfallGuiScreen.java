@@ -332,6 +332,19 @@ public final class NightfallGuiScreen extends class_437 {
                default -> 1.0F - (float)Math.pow(1.0F - progress, 3.0);
             };
          }
+          if (click && progress >= 1.0F && inside(mx, my, 12, 10, 164, 78)) {
+             long now = System.currentTimeMillis();
+             if (now - this.lastNinoSecretClick > 1200L) {
+                this.ninoSecretClicks = 0;
+             }
+
+             this.lastNinoSecretClick = now;
+             if (++this.ninoSecretClicks >= 5) {
+                this.ninoSecretUnlocked = true;
+                this.ninoSecretClicks = 0;
+             }
+          }
+
          float offsetX = 0.0F;
          float offsetY = 0.0F;
          float scale = 1.0F;
@@ -371,19 +384,6 @@ public final class NightfallGuiScreen extends class_437 {
          }
          return;
       }
-      if (click && inside(mx, my, 12, 10, 164, 78)) {
-         long now = System.currentTimeMillis();
-         if (now - this.lastNinoSecretClick > 1200L) {
-            this.ninoSecretClicks = 0;
-         }
-
-         this.lastNinoSecretClick = now;
-         if (++this.ninoSecretClicks >= 5) {
-            this.ninoSecretUnlocked = true;
-            this.ninoSecretClicks = 0;
-         }
-      }
-
       ctx.method_25294(0, 0, this.field_22789, this.field_22790, -1459091184);
       int blurShade = Math.max(0, Math.min(150, Config.blurStrength));
       ctx.method_25294(0, 0, this.field_22789, this.field_22790, blurShade << 24 | 526095);
