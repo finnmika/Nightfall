@@ -21,7 +21,7 @@ public final class StructureESP extends Module {
    private final BoolSetting trial = this.add(new BoolSetting("Trial-Spawner", true));
    private final BoolSetting chests = this.add(new BoolSetting("Kisten", true));
    private final BoolSetting suspicious = this.add(new BoolSetting("Verdächtige Bloecke", true));
-   private final List<class_2338> positions = new ArrayList<>();
+   private final List<class_238> positions = new ArrayList<>();
    private int timer;
 
    public StructureESP() {
@@ -61,7 +61,7 @@ public final class StructureESP extends Module {
                         ) {
                            class_2338 bp = new class_2338(x, y, z);
                            if (this.match(mc.field_1687.method_8320(bp).method_26204())) {
-                              this.positions.add(bp.method_10062());
+                              this.positions.add(new class_238(bp));
                            }
                         }
                      }
@@ -75,8 +75,8 @@ public final class StructureESP extends Module {
    @Override
    public void renderHud(class_332 ctx) {
       if (Projection.valid()) {
-         for (class_2338 p : this.positions) {
-            Draw.box(ctx, new class_238(p), -571164350, 1, true);
+         for (class_238 box : this.positions) {
+            Draw.box(ctx, box, -571164350, 1, true);
          }
       }
    }
