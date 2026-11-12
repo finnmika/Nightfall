@@ -320,7 +320,55 @@ public final class NightfallGuiScreen extends class_437 {
       boolean rightClick = right && !this.prevRight;
       this.prevLeft = left;
       this.prevRight = right;
-      if (this.drawPremiumLayout(ctx, mx, my, click, release, rightClick, left, mc)) {
+      if (this.field_22789 >= 720 || this.field_22790 >= 400) {
+         float duration = Math.max(50, Config.guiAnimationDuration) / Math.max(0.1F, Config.guiAnimationSpeed);
+         float progress = Config.guiAnimations
+            ? Math.max(0.0F, Math.min(1.0F, (float)(System.nanoTime() - this.tabChangedAt) / 1000000.0F / duration))
+            : 1.0F;
+         if (Config.guiAnimations) {
+            progress = switch (Config.guiEasing) {
+               case "Linear" -> progress;
+               case "Sine" -> (float)(1.0 - Math.cos(progress * Math.PI * 0.5));
+               default -> 1.0F - (float)Math.pow(1.0F - progress, 3.0);
+            };
+         }
+         float offsetX = 0.0F;
+         float offsetY = 0.0F;
+         float scale = 1.0F;
+         if (Config.guiAnimations && Config.guiAnimationType.equals("Slide")) {
+            float distance = 28.0F * (1.0F - progress);
+            switch (Config.guiAnimationDirection) {
+               case "Right" -> offsetX = distance;
+               case "Up" -> offsetY = -distance;
+               case "Down" -> offsetY = distance;
+               default -> offsetX = -distance;
+            }
+         } else if (Config.guiAnimations && Config.guiAnimationType.equals("Scale")) {
+            scale = 0.92F + 0.08F * progress;
+         } else if (Config.guiAnimations && Config.guiAnimationType.equals("Zoom")) {
+            scale = 0.78F + 0.22F * progress;
+         } else if (Config.guiAnimations && Config.guiAnimationType.equals("Fade")) {
+            scale = 0.985F + 0.015F * progress;
+         }
+
+         var matrices = ctx.method_51448();
+         matrices.pushMatrix();
+         if (scale != 1.0F) {
+            float cx = this.field_22789 / 2.0F;
+            float cy = this.field_22790 / 2.0F;
+            matrices.translate(cx + offsetX, cy + offsetY);
+            matrices.scale(scale, scale);
+            matrices.translate(-cx, -cy);
+         } else if (offsetX != 0.0F || offsetY != 0.0F) {
+            matrices.translate(offsetX, offsetY);
+         }
+         this.drawPremiumLayout(ctx, mx, my, click && progress >= 1.0F, release, rightClick && progress >= 1.0F, left && progress >= 1.0F, mc);
+         matrices.popMatrix();
+
+         if (Config.guiAnimations && Config.guiAnimationType.equals("Fade") && progress < 1.0F) {
+            int alpha = Math.max(0, Math.min(255, Math.round((1.0F - progress) * 255.0F)));
+            ctx.method_25294(0, 0, this.field_22789, this.field_22790, alpha << 24);
+         }
          return;
       }
       if (click && inside(mx, my, 12, 10, 164, 78)) {
