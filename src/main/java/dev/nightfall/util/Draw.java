@@ -11,6 +11,7 @@ public final class Draw {
    public static float botY;
    private static final double[][] C = new double[8][2];
    private static final boolean[] OK = new boolean[8];
+   private static final float[] CLIPPED_LINE = new float[4];
 
    private Draw() {
    }
@@ -20,12 +21,11 @@ public final class Draw {
    }
 
    public static void line(class_332 ctx, float x1, float y1, float x2, float y2, int argb, int th, boolean smooth) {
-      float[] clipped = clipLine(x1, y1, x2, y2, Projection.width(), Projection.height());
-      if (clipped != null) {
-         x1 = clipped[0];
-         y1 = clipped[1];
-         x2 = clipped[2];
-         y2 = clipped[3];
+      if (clipLine(x1, y1, x2, y2, Projection.width(), Projection.height(), CLIPPED_LINE)) {
+         x1 = CLIPPED_LINE[0];
+         y1 = CLIPPED_LINE[1];
+         x2 = CLIPPED_LINE[2];
+         y2 = CLIPPED_LINE[3];
          float dx = x2 - x1;
          float dy = y2 - y1;
          float len = (float)Math.sqrt(dx * dx + dy * dy);
@@ -157,42 +157,42 @@ public final class Draw {
       }
    }
 
-   private static float[] clipLine(float x0, float y0, float x1, float y1, int width, int height) {
-      if (width > 0 && height > 0 && Float.isFinite(x0) && Float.isFinite(y0) && Float.isFinite(x1) && Float.isFinite(y1)) {
-         float dx = x1 - x0;
-         float dy = y1 - y0;
-         float[] p = new float[]{-dx, dx, -dy, dy};
-         float[] q = new float[]{x0, width - x0, y0, height - y0};
-         float u0 = 0.0F;
-         float u1 = 1.0F;
-
-         for (int i = 0; i < 4; i++) {
-            if (Math.abs(p[i]) < 1.0E-6F) {
-               if (q[i] < 0.0F) {
-                  return null;
-               }
+   private static boolean clipLine(float x0, float y0, float x1, float y1, int width, int height, float[] out) {
+      if (width <= 0 || height <= 0 || !Float.isFinite(x0) || !Float.isFinite(y0)
+         || !Float.isFinite(x1) || !Float.isFinite(y1)) {
+         return false;
+      }
+      float dx = x1 - x0;
+      float dy = y1 - y0;
+      float u0 = 0.0F;
+      float u1 = 1.0F;
+      for (int i = 0; i < 4; i++) {
+         float p;
+         float q;
+         switch (i) {
+            case 0 -> { p = -dx; q = x0; }
+            case 1 -> { p = dx; q = width - x0; }
+            case 2 -> { p = -dy; q = y0; }
+            default -> { p = dy; q = height - y0; }
+         }
+         if (Math.abs(p) < 1.0E-6F) {
+            if (q < 0.0F) return false;
+         } else {
+            float r = q / p;
+            if (p < 0.0F) {
+               if (r > u1) return false;
+               u0 = Math.max(u0, r);
             } else {
-               float r = q[i] / p[i];
-               if (p[i] < 0.0F) {
-                  if (r > u1) {
-                     return null;
-                  }
-
-                  u0 = Math.max(u0, r);
-               } else {
-                  if (r < u0) {
-                     return null;
-                  }
-
-                  u1 = Math.min(u1, r);
-               }
+               if (r < u0) return false;
+               u1 = Math.min(u1, r);
             }
          }
-
-         return new float[]{x0 + u0 * dx, y0 + u0 * dy, x0 + u1 * dx, y0 + u1 * dy};
-      } else {
-         return null;
       }
+      out[0] = x0 + u0 * dx;
+      out[1] = y0 + u0 * dy;
+      out[2] = x0 + u1 * dx;
+      out[3] = y0 + u1 * dy;
+      return true;
    }
 
    public static void centeredText(class_332 ctx, class_327 tr, String s, float cx, float y, int argb) {
