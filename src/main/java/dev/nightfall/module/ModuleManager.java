@@ -14,6 +14,7 @@ import dev.nightfall.modules.AutoFarm;
 import dev.nightfall.modules.AutoFish;
 import dev.nightfall.modules.AutoGap;
 import dev.nightfall.modules.AutoPvp;
+import dev.nightfall.modules.DTap;
 import dev.nightfall.modules.AutoReconnect;
 import dev.nightfall.modules.AutoRespawn;
 import dev.nightfall.modules.AutoShield;
@@ -118,6 +119,7 @@ public final class ModuleManager {
       MODULES.add(new TriggerBot());
       MODULES.add(new FriendManager());
       MODULES.add(new AutoPvp());
+      MODULES.add(new DTap());
       MODULES.add(new TrapperBot());
       MODULES.add(new ObiTrapBot());
       MODULES.add(new AutoShield());
