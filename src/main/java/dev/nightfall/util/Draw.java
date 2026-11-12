@@ -52,6 +52,10 @@ public final class Draw {
    }
 
    public static boolean box(class_332 ctx, class_238 b, int argb, int th, boolean threeD, boolean smooth) {
+      return box(ctx, b.field_1323, b.field_1322, b.field_1321, b.field_1320, b.field_1325, b.field_1324, argb, th, threeD, smooth);
+   }
+
+   public static boolean box(class_332 ctx, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, int argb, int th, boolean threeD, boolean smooth) {
       int any = 0;
       float minX = Float.MAX_VALUE;
       float minY = Float.MAX_VALUE;
