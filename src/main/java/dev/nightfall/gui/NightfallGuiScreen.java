@@ -528,9 +528,11 @@ public final class NightfallGuiScreen extends class_437 {
          return true;
       }
 
+      float scale = Config.guiScalePercent / 100.0F;
+      int edge = Config.guiEdgeMargin;
       int sw = this.field_22789;
       int sh = this.field_22790;
-      if (click && inside(mx, my, 10, 9, Math.max(126, Math.min(150, sw / 6)) - 8, 54)) {
+      if (click && inside(mx, my, 10 + edge, 9 + edge, Math.max(126, Math.min(150, sw / 6)) - 8, 54)) {
          this.activeTab = "Config";
          this.tabChangedAt = System.nanoTime();
          this.scroll = 0;
@@ -545,7 +547,7 @@ public final class NightfallGuiScreen extends class_437 {
       int bottomY = Math.max(220 + edge, sh / 2 + 8);
       int headerH = 54;
 
-      if (click && inside(mx, my, 8, 8, sw - 16, headerH)) {
+      if (click && inside(mx, my, 8 + edge, 8 + edge, sw - 16 - edge * 2, headerH)) {
          this.activeTab = "Config";
          this.tabChangedAt = System.nanoTime();
          this.scroll = 0;
@@ -1138,6 +1140,8 @@ public final class NightfallGuiScreen extends class_437 {
       if (this.slider.isEmpty()) return;
       float t = Math.max(0.0F, Math.min(1.0F, (float)(mx - this.sliderX) / Math.max(1, this.sliderW)));
       switch (this.slider) {
+         case "hue" -> { Config.accentHue = t * 360.0F; this.applyHue(); }
+         case "blur" -> Config.blurStrength = Math.round(t * 150.0F);
          case "transparency" -> Config.guiTransparency = 35 + Math.round(t * 65);
          case "border" -> Config.borderSize = 1 + Math.round(t * 5);
          case "radius" -> Config.cornerRadius = 4 + Math.round(t * 18);
