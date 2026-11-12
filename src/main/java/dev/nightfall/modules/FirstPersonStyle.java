@@ -42,8 +42,8 @@ public final class FirstPersonStyle extends Module {
       float rx = this.pitch.get().floatValue();
       float ry = this.yaw.get().floatValue();
       float rz = this.roll.get().floatValue();
-      String s = this.pose.get();
-      switch (s) {
+      String poseName = this.pose.get();
+      switch (poseName) {
          case "Katana":
             tx += 0.06 * side;
             ty -= 0.035;
@@ -77,7 +77,7 @@ public final class FirstPersonStyle extends Module {
       matrices.method_22907(
          new Quaternionf().rotateX((float)Math.toRadians(rx)).rotateY((float)Math.toRadians(ry * side)).rotateZ((float)Math.toRadians(rz * side))
       );
-      float s = this.scale.get().floatValue();
-      matrices.method_22905(s, s, s);
+      float itemScale = this.scale.get().floatValue();
+      matrices.method_22905(itemScale, itemScale, itemScale);
    }
 }
