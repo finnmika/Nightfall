@@ -57,7 +57,7 @@ public final class ObiTrapBot extends Module {
       if (mc.field_1724 != null && mc.field_1687 != null) {
          if (mc.field_1765 instanceof class_3966 hit && hit.method_17782() instanceof class_1657 player && player != mc.field_1724) {
             this.target = player;
-            this.anchor = this.target.method_24515().method_10062();
+            this.anchor = this.target.method_24515();
             this.phase = "obsidian";
             this.idleTicks = 0;
             mc.field_1724.method_7353(class_2561.method_43470("[Obitrap] Baue die Box um " + this.target.method_5477().getString() + "."), false);
