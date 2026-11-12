@@ -1,6 +1,7 @@
 package dev.nightfall.util;
 
 import dev.nightfall.mixin.GameRendererAccessor;
+import dev.nightfall.mixin.CameraProjectionAccessor;
 import net.minecraft.class_1297;
 import net.minecraft.class_238;
 import net.minecraft.class_243;
