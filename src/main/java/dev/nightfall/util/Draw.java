@@ -55,7 +55,7 @@ public final class Draw {
       return box(ctx, b.field_1323, b.field_1322, b.field_1321, b.field_1320, b.field_1325, b.field_1324, argb, th, threeD, smooth);
    }
 
-   public static boolean box(class_332 ctx, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, int argb, int th, boolean threeD, boolean smooth) {
+   public static boolean box(class_332 ctx, double worldMinX, double worldMinY, double worldMinZ, double worldMaxX, double worldMaxY, double worldMaxZ, int argb, int th, boolean threeD, boolean smooth) {
       int any = 0;
       float minX = Float.MAX_VALUE;
       float minY = Float.MAX_VALUE;
@@ -64,9 +64,9 @@ public final class Draw {
       boolean all = true;
 
       for (int i = 0; i < 8; i++) {
-         double x = (i & 1) == 0 ? b.field_1323 : b.field_1320;
-         double y = (i & 2) == 0 ? b.field_1322 : b.field_1325;
-         double z = (i & 4) == 0 ? b.field_1321 : b.field_1324;
+         double x = (i & 1) == 0 ? worldMinX : worldMaxX;
+         double y = (i & 2) == 0 ? worldMinY : worldMaxY;
+         double z = (i & 4) == 0 ? worldMinZ : worldMaxZ;
          OK[i] = Projection.project(x, y, z, C[i]);
          if (OK[i]) {
             any++;
