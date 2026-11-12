@@ -90,11 +90,7 @@ public final class Draw {
                int x1 = Math.max(0, Math.min(Projection.width(), Math.round(maxX)));
                int y1 = Math.max(0, Math.min(Projection.height(), Math.round(maxY)));
                if (x1 > x0 && y1 > y0) {
-                  int t = Math.max(1, Math.min(th, Math.min(x1 - x0, y1 - y0)));
-                  ctx.method_25294(x0, y0, x1, Math.min(y1, y0 + t), argb);
-                  ctx.method_25294(x0, Math.max(y0, y1 - t), x1, y1, argb);
-                  ctx.method_25294(x0, y0, Math.min(x1, x0 + t), y1, argb);
-                  ctx.method_25294(Math.max(x0, x1 - t), y0, x1, y1, argb);
+                  roundedOutline(ctx, x0, y0, x1, y1, argb, th, smooth);
                   return true;
                } else {
                   return false;
@@ -118,6 +114,46 @@ public final class Draw {
          }
       } else {
          return false;
+      }
+   }
+
+   private static void roundedOutline(class_332 ctx, int x0, int y0, int x1, int y1, int argb, int thickness, boolean smooth) {
+      float radius = Math.min(4.0F, Math.min((x1 - x0) * 0.2F, (y1 - y0) * 0.2F));
+      if (radius < 1.5F) {
+         int t = Math.max(1, Math.min(thickness, Math.min(x1 - x0, y1 - y0)));
+         ctx.method_25294(x0, y0, x1, Math.min(y1, y0 + t), argb);
+         ctx.method_25294(x0, Math.max(y0, y1 - t), x1, y1, argb);
+         ctx.method_25294(x0, y0, Math.min(x1, x0 + t), y1, argb);
+         ctx.method_25294(Math.max(x0, x1 - t), y0, x1, y1, argb);
+         return;
+      }
+      float left = x0 + radius;
+      float right = x1 - radius;
+      float top = y0 + radius;
+      float bottom = y1 - radius;
+      line(ctx, left, y0, right, y0, argb, thickness, smooth);
+      line(ctx, right, y1, left, y1, argb, thickness, smooth);
+      line(ctx, x0, top, x0, bottom, argb, thickness, smooth);
+      line(ctx, x1, bottom, x1, top, argb, thickness, smooth);
+      for (int corner = 0; corner < 4; corner++) {
+         float cx = corner == 0 || corner == 3 ? left : right;
+         float cy = corner < 2 ? top : bottom;
+         float start = switch (corner) {
+            case 0 -> 180.0F;
+            case 1 -> 270.0F;
+            case 2 -> 0.0F;
+            default -> 90.0F;
+         };
+         float previousX = cx + (float)Math.cos(Math.toRadians(start)) * radius;
+         float previousY = cy + (float)Math.sin(Math.toRadians(start)) * radius;
+         for (int step = 1; step <= 6; step++) {
+            float angle = (float)Math.toRadians(start + step * 90.0F / 6.0F);
+            float nextX = cx + (float)Math.cos(angle) * radius;
+            float nextY = cy + (float)Math.sin(angle) * radius;
+            line(ctx, previousX, previousY, nextX, nextY, argb, thickness, smooth);
+            previousX = nextX;
+            previousY = nextY;
+         }
       }
    }
 
