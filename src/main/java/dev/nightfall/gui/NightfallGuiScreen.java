@@ -733,7 +733,6 @@ public final class NightfallGuiScreen extends class_437 {
          : Math.max(0, Math.min(availableBody, tab.equals("Config") ? 470 : Math.max(82, visible + 34)));
       this.panel(ctx, x, y, w, 25 + bodyH);
       roundedRect(ctx, x, y, w, 25, Config.cornerRadius, Theme.withAlpha(-300937959, Math.max(0, (100 - Config.guiTransparency) * 255 / 100)));
-      roundedRect(ctx, x, y, Math.max(2, Config.borderSize), 25, 2, Theme.ACCENT);
       ctx.method_51433(mc.field_1772, icon(tab) + "  " + tab, x + 10, y + 9, Theme.TEXT, true);
       if (click && inside(mx, my, x, y, w, 25)) {
          this.draggingWindow = true;
