@@ -409,7 +409,7 @@ public class AutoPvp extends Module {
          boolean crystalStillThere = false;
          for (class_1297 entity : mc.field_1687.method_18112()) {
             if (entity instanceof class_1511 crystal && crystal.method_5805()
-               && crystal.method_19538().method_1022(new class_243(this.crystalComboBase.method_10263() + 0.5,
+               && new class_243(crystal.method_23317(), crystal.method_23318(), crystal.method_23321()).method_1022(new class_243(this.crystalComboBase.method_10263() + 0.5,
                   this.crystalComboBase.method_10264() + 1.0, this.crystalComboBase.method_10260() + 0.5)) < 1.5) {
                crystalStillThere = true;
                break;
@@ -425,7 +425,7 @@ public class AutoPvp extends Module {
          boolean existing = false;
          for (class_1297 entity : mc.field_1687.method_18112()) {
             if (entity instanceof class_1511 crystal && crystal.method_5805()
-               && crystal.method_19538().method_1022(new class_243(this.crystalComboBase.method_10263() + 0.5,
+               && new class_243(crystal.method_23317(), crystal.method_23318(), crystal.method_23321()).method_1022(new class_243(this.crystalComboBase.method_10263() + 0.5,
                   this.crystalComboBase.method_10264() + 1.0, this.crystalComboBase.method_10260() + 0.5)) < 1.5) {
                existing = true;
                mc.field_1761.method_2918(p, crystal);
