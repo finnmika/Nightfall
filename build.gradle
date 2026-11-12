@@ -43,8 +43,11 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
-tasks.named('sourcesJar') {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+// Configure lazily so this also works if Loom registers sourcesJar after this script.
+tasks.configureEach {
+    if (name == 'sourcesJar') {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
 }
 
 jar {
