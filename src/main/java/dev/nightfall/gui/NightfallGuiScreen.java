@@ -320,7 +320,7 @@ public final class NightfallGuiScreen extends class_437 {
       boolean rightClick = right && !this.prevRight;
       this.prevLeft = left;
       this.prevRight = right;
-      if (this.field_22789 >= 720 || this.field_22790 >= 400) {
+      {
          float duration = Math.max(50, Config.guiAnimationDuration) / Math.max(0.1F, Config.guiAnimationSpeed);
          float progress = Config.guiAnimations
             ? Math.max(0.0F, Math.min(1.0F, (float)(System.nanoTime() - this.tabChangedAt) / 1000000.0F / duration))
