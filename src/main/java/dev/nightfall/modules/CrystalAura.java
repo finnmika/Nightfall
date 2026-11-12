@@ -84,7 +84,7 @@ public class CrystalAura extends Module {
 
          if (this.place.get() && this.placeT <= 0) {
             class_1657 target = CombatUtil.nearestPlayer(this.targetRange.get());
-            if (target != null) {
+            if (target != null && !target.method_24828()) {
                class_1268 hand = p.method_6079().method_31574(class_1802.field_8301)
                   ? class_1268.field_5810
                   : (p.method_6047().method_31574(class_1802.field_8301) ? class_1268.field_5808 : null);
