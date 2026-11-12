@@ -451,8 +451,6 @@ public final class NightfallGuiScreen extends class_437 {
       }
 
       this.drawWindow(ctx, this.activeTab, x + offsetX, yx + offsetY, w, mx, my, click, rightClick, mc);
-      this.updateConfigSlider(mx, left, release);
-      this.updateConfigSlider(mx, left, release);
       if (this.numberSlider != null) {
          float amount = Math.max(0.0F, Math.min(1.0F, (float)(mx - this.numberSliderX) / Math.max(1, this.numberSliderW)));
          this.numberSlider.set(this.numberSlider.min + amount * (this.numberSlider.max - this.numberSlider.min));
@@ -628,6 +626,7 @@ public final class NightfallGuiScreen extends class_437 {
       if (System.currentTimeMillis() < this.feedbackUntil) {
          this.drawFeedback(ctx);
       }
+      this.updateConfigSlider(mx, left, release);
 
       if (this.draggingWindow && this.dragPanel != null) {
          int[] dragged = this.panel(this.dragPanel, x1, topY);
@@ -706,6 +705,7 @@ public final class NightfallGuiScreen extends class_437 {
       if (System.currentTimeMillis() < this.feedbackUntil) {
          this.drawFeedback(ctx);
       }
+      this.updateConfigSlider(mx, left, release);
    }
 
    private void drawWindow(class_332 ctx, String tab, int x, int y, int w, int mx, int my, boolean click, boolean rightClick, class_310 mc) {
@@ -727,6 +727,7 @@ public final class NightfallGuiScreen extends class_437 {
       }
 
       int availableBody = Math.max(64, this.field_22790 - y - 25 - 12);
+      if (tab.equals("Config")) availableBody = Math.max(availableBody, this.field_22790 - y - 36);
       if (this.field_22789 >= 720 && this.field_22790 >= 400) {
          availableBody = Math.min(availableBody, Math.max(82, this.field_22790 / 2 - 48));
       }
@@ -734,8 +735,8 @@ public final class NightfallGuiScreen extends class_437 {
          ? 0
          : Math.max(0, Math.min(availableBody, tab.equals("Config") ? 470 : Math.max(82, visible + 34)));
       this.panel(ctx, x, y, w, 25 + bodyH);
-      ctx.method_25294(x, y, x + w, y + 25, -300937959);
-      ctx.method_25294(x, y, x + 2, y + 25, Theme.ACCENT);
+      roundedRect(ctx, x, y, w, 25, Config.cornerRadius, -300937959);
+      roundedRect(ctx, x, y, Math.max(2, Config.borderSize), 25, 2, Theme.ACCENT);
       ctx.method_51433(mc.field_1772, icon(tab) + "  " + tab, x + 10, y + 9, Theme.TEXT, true);
       ctx.method_51433(mc.field_1772, "_", x + w - 35, y + 8, Theme.TEXT_DIM, true);
       ctx.method_51433(mc.field_1772, "x", x + w - 17, y + 8, Theme.TEXT, true);
@@ -813,7 +814,7 @@ public final class NightfallGuiScreen extends class_437 {
                   boolean over = inside(mx, my, x + 4, rowY, w - 8, 22);
                   int rowHover = Math.round(75.0F * this.hoverValue("module:" + tab + ":" + mod.getName(), over));
                   if (rowHover > 0) {
-                     ctx.method_25294(x + 4, rowY, x + w - 4, rowY + 22 - 1, Theme.withAlpha(Theme.ACCENT, rowHover));
+                     roundedRect(ctx, x + 4, rowY, w - 8, 21, Math.min(10, Config.cornerRadius), Theme.withAlpha(Theme.ACCENT, rowHover));
                   }
 
                   ctx.method_51433(mc.field_1772, mod.getName(), x + 10, rowY + 7, mod.isEnabled() ? Theme.TEXT : Theme.TEXT_DIM, false);
@@ -1107,7 +1108,7 @@ public final class NightfallGuiScreen extends class_437 {
          Config.guiAnimationSpeed = Config.guiAnimationSpeed >= 5.0F ? 0.1F : Math.min(5.0F, Config.guiAnimationSpeed + 0.1F);
       }
 
-      this.beginConfigSlider(click, mx, x + 10, y + 292, w - 20, "transparency");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 292, w - 20, "transparency");
       this.beginConfigSlider(click, mx, x + 10, y + 330, w - 20, "border");
       this.beginConfigSlider(click, mx, x + 10, y + 368, w - 20, "radius");
       this.beginConfigSlider(click, mx, x + 10, y + 406, w - 20, "scale");
@@ -1125,8 +1126,8 @@ public final class NightfallGuiScreen extends class_437 {
       this.drawSlider(ctx, x, y + 17, w, amount);
    }
 
-   private void beginConfigSlider(boolean click, int mx, int x, int y, int w, String id) {
-      if (click && inside(mx, this.lastMouseY, x, y, w, 14)) {
+   private void beginConfigSlider(boolean click, int mx, int my, int x, int y, int w, String id) {
+      if (click && inside(mx, my, x, y, w, 14)) {
          this.slider = id;
          this.sliderX = x;
          this.sliderW = w;
@@ -1150,7 +1151,7 @@ public final class NightfallGuiScreen extends class_437 {
    }
 
    private void drawConfigOption(class_332 ctx, class_310 mc, String label, String value, int x, int y, int w) {
-      ctx.method_25294(x, y, x + w, y + 18, 941627435);
+      roundedRect(ctx, x, y, w, 18, Math.min(9, Config.cornerRadius), 941627435);
       ctx.method_51433(mc.field_1772, label, x + 5, y + 5, Theme.TEXT_DIM, false);
       int vw = mc.field_1772.method_1727(value);
       ctx.method_51433(mc.field_1772, value, x + w - vw - 5, y + 5, Theme.ACCENT, true);
