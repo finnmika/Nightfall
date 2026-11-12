@@ -556,19 +556,17 @@ public final class NightfallGuiScreen extends class_437 {
       ctx.method_25294(0, 0, sw, sh, -1459091184);
       int shade = Math.max(0, Math.min(150, Config.blurStrength));
       ctx.method_25294(0, 0, sw, sh, shade << 24 | 526095);
-      ctx.method_25294(0, 0, sw, 3, Theme.ACCENT);
-
       this.panel(ctx, 10 + edge, 9 + edge, side - 8, headerH);
-      ctx.method_51433(mc.field_1772, "◒", 24, 27, Theme.ACCENT, true);
-      ctx.method_51433(mc.field_1772, "NIGHTFALL", 48, 23, Theme.TEXT, true);
-      ctx.method_51433(mc.field_1772, "PREMIUM CLIENT", 49, 39, Theme.TEXT_DIM, false);
+      ctx.method_51433(mc.field_1772, "◒", 24 + edge, 27 + edge, Theme.ACCENT, true);
+      ctx.method_51433(mc.field_1772, "NIGHTFALL", 48 + edge, 23 + edge, Theme.TEXT, true);
+      ctx.method_51433(mc.field_1772, "PREMIUM CLIENT", 49 + edge, 39 + edge, Theme.TEXT_DIM, false);
 
       int statusW = 190;
       int statusX = sw - statusW - 12 - edge;
-      this.panel(ctx, statusX, 14, statusW, 27);
-      ctx.method_51433(mc.field_1772, "FPS", statusX + 9, 23, Theme.ACCENT, true);
-      ctx.method_51433(mc.field_1772, String.valueOf(mc.method_47599()), statusX + 34, 23, Theme.TEXT, false);
-      ctx.method_51433(mc.field_1772, "1.21.11", statusX + 104, 23, Theme.TEXT_DIM, false);
+      this.panel(ctx, statusX, 14 + edge, statusW, 27);
+      ctx.method_51433(mc.field_1772, "FPS", statusX + 9, 23 + edge, Theme.ACCENT, true);
+      ctx.method_51433(mc.field_1772, String.valueOf(mc.method_47599()), statusX + 34, 23 + edge, Theme.TEXT, false);
+      ctx.method_51433(mc.field_1772, "1.21.11", statusX + 104, 23 + edge, Theme.TEXT_DIM, false);
 
       String[] nav = {"Combat", "Movement", "Visuals", "Player", "World", "Misc", "HUD", "Config"};
       for (int i = 0; i < nav.length; i++) {
@@ -582,8 +580,8 @@ public final class NightfallGuiScreen extends class_437 {
          } else if (over) {
             roundedRect(ctx, 12 + edge, ny, side - 12, Math.round(30 * scale), Config.cornerRadius, Theme.withAlpha(Theme.ACCENT, 45));
          }
-         ctx.method_51433(mc.field_1772, icon(tab), 23, ny + 10, Theme.ACCENT, true);
-         ctx.method_51433(mc.field_1772, tab, 49, ny + 10, active ? Theme.TEXT : Theme.TEXT_DIM, true);
+         ctx.method_51433(mc.field_1772, icon(tab), 23 + edge, ny + 10, Theme.ACCENT, true);
+         ctx.method_51433(mc.field_1772, tab, 49 + edge, ny + 10, active ? Theme.TEXT : Theme.TEXT_DIM, true);
          if (click && over) {
             this.activeTab = tab;
             this.tabChangedAt = System.nanoTime();
@@ -593,9 +591,9 @@ public final class NightfallGuiScreen extends class_437 {
 
       int profileY = sh - 57 - edge;
       this.panel(ctx, 12 + edge, profileY, side - 20, 45);
-      ctx.method_51433(mc.field_1772, "FW", 22, profileY + 12, Theme.ACCENT, true);
-      ctx.method_51433(mc.field_1772, "Finni0512", 49, profileY + 10, Theme.TEXT, true);
-      ctx.method_51433(mc.field_1772, "Premium", 49, profileY + 25, Theme.ACCENT, false);
+      ctx.method_51433(mc.field_1772, "FW", 22 + edge, profileY + 12, Theme.ACCENT, true);
+      ctx.method_51433(mc.field_1772, "Finni0512", 49 + edge, profileY + 10, Theme.TEXT, true);
+      ctx.method_51433(mc.field_1772, "Premium", 49 + edge, profileY + 25, Theme.ACCENT, false);
 
       if (this.activeTab.equals("Config")) {
          this.drawWindow(ctx, "Config", x1, topY, Math.max(260, sw - x1 - 18), mx, my, click, rightClick, mc);
@@ -654,13 +652,11 @@ public final class NightfallGuiScreen extends class_437 {
       ctx.method_25294(0, 0, sw, sh, -1459091184);
       int shade = Math.max(0, Math.min(150, Config.blurStrength));
       ctx.method_25294(0, 0, sw, sh, shade << 24 | 526095);
-      ctx.method_25294(0, 0, sw, 3, Theme.ACCENT);
-
       this.panel(ctx, 8 + edge, 8 + edge, sw - 16 - edge * 2, headerH);
-      ctx.method_51433(mc.field_1772, "◒", 17, 19, Theme.ACCENT, true);
-      ctx.method_51433(mc.field_1772, "NIGHTFALL", 37, 17, Theme.TEXT, true);
-      ctx.method_51433(mc.field_1772, "PREMIUM CLIENT", 38, 31, Theme.TEXT_DIM, false);
-      ctx.method_51433(mc.field_1772, "FPS " + mc.method_47599(), sw - 74, 23, Theme.ACCENT, true);
+      ctx.method_51433(mc.field_1772, "◒", 17 + edge, 19 + edge, Theme.ACCENT, true);
+      ctx.method_51433(mc.field_1772, "NIGHTFALL", 37 + edge, 17 + edge, Theme.TEXT, true);
+      ctx.method_51433(mc.field_1772, "PREMIUM CLIENT", 38 + edge, 31 + edge, Theme.TEXT_DIM, false);
+      ctx.method_51433(mc.field_1772, "FPS " + mc.method_47599(), sw - 74 - edge, 23 + edge, Theme.ACCENT, true);
 
       String[] nav = {"Combat", "Movement", "Visuals", "Player", "World", "Misc", "HUD", "Config"};
       int navY = headerH + 18 + edge;
