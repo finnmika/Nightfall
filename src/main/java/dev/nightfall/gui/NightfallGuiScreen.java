@@ -48,6 +48,12 @@ public final class NightfallGuiScreen extends class_437 {
    private int sliderX;
    private int sliderW;
    private int scroll;
+   private int configScroll;
+   private int configScrollMax;
+   private int configPanelX;
+   private int configPanelY;
+   private int configPanelW;
+   private int configPanelH;
    private long tabChangedAt = System.nanoTime();
    private long guiOpenedAt = System.nanoTime();
    private int ninoSecretClicks;
@@ -92,7 +98,14 @@ public final class NightfallGuiScreen extends class_437 {
    }
 
    public boolean method_25401(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-      this.scroll = Math.max(0, Math.min(5000, this.scroll - (int)Math.round(verticalAmount * 28.0)));
+      int mx = (int)mouseX;
+      int my = (int)mouseY;
+      if (this.activeTab.equals("Config")
+         && inside(mx, my, this.configPanelX, this.configPanelY + 25, this.configPanelW, this.configPanelH)) {
+         this.configScroll = Math.max(0, Math.min(this.configScrollMax, this.configScroll - (int)Math.round(verticalAmount * 28.0)));
+      } else {
+         this.scroll = Math.max(0, Math.min(5000, this.scroll - (int)Math.round(verticalAmount * 28.0)));
+      }
       return true;
    }
 
@@ -839,7 +852,7 @@ public final class NightfallGuiScreen extends class_437 {
       }
       int bodyH = this.pMinimized(tab)
          ? 0
-         : Math.max(0, Math.min(availableBody, tab.equals("Config") ? 470 : Math.max(82, visible + 34)));
+         : Math.max(0, Math.min(availableBody, tab.equals("Config") ? 340 : Math.max(82, visible + 34)));
       this.panel(ctx, x, y, w, 25 + bodyH);
       roundedRect(ctx, x, y, w, 25, Config.cornerRadius, Theme.withAlpha(-300937959, Math.max(0, (100 - Config.guiTransparency) * 255 / 100)));
       ctx.method_51433(mc.field_1772, icon(tab) + "  " + tab, x + 10, y + 9, Theme.TEXT, true);
@@ -852,7 +865,25 @@ public final class NightfallGuiScreen extends class_437 {
 
       if (bodyH != 0) {
          if (tab.equals("Config")) {
-            this.drawConfig(ctx, x, y, w, mx, my, click);
+            this.configPanelX = x;
+            this.configPanelY = y;
+            this.configPanelW = w;
+            this.configPanelH = bodyH;
+            this.configScrollMax = Math.max(0, 440 - bodyH);
+            this.configScroll = Math.max(0, Math.min(this.configScroll, this.configScrollMax));
+            int clipTop = y + 25;
+            int clipBottom = clipTop + bodyH;
+            ctx.method_44379(x + 4, clipTop, x + w - 4, clipBottom);
+            this.drawConfig(ctx, x, y - this.configScroll, w, mx, my,
+               click && inside(mx, my, x + 4, clipTop, w - 8, bodyH));
+            ctx.method_44380();
+            if (this.configScrollMax > 0) {
+               int trackX = x + w - 5;
+               int thumbH = Math.max(24, bodyH * bodyH / 440);
+               int thumbY = clipTop + (bodyH - thumbH) * this.configScroll / this.configScrollMax;
+               ctx.method_25294(trackX, clipTop + 3, trackX + 2, clipBottom - 3, 0x55333333);
+               roundedRect(ctx, trackX - 1, thumbY + 3, 4, Math.max(12, thumbH - 6), 2, Theme.withAlpha(Theme.ACCENT, 210));
+            }
          } else {
             int controlY = y + 25 + 5;
             boolean searchOver = inside(mx, my, x + 8, controlY, w - 82, 19);
