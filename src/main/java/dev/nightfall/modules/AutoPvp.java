@@ -11,6 +11,10 @@ import net.minecraft.class_1268;
 import net.minecraft.class_1657;
 import net.minecraft.class_1802;
 import net.minecraft.class_2338;
+import net.minecraft.class_2350;
+import net.minecraft.class_3965;
+import net.minecraft.class_1511;
+import net.minecraft.class_1297;
 import net.minecraft.class_243;
 import net.minecraft.class_2680;
 import net.minecraft.class_304;
@@ -35,6 +39,11 @@ public class AutoPvp extends Module {
    private final BoolSetting useCrystalAura = this.add(new BoolSetting("CrystalAura integrieren", false));
    private final BoolSetting useAutoAnchor = this.add(new BoolSetting("AutoAnchor integrieren", false));
    private final BoolSetting useMaceAssist = this.add(new BoolSetting("MaceAssist integrieren", true));
+   private final BoolSetting crystalCombo = this.add(new BoolSetting("Sprint-Hit + Obsidian + 2 Crystals", true));
+   private int crystalComboPhase;
+   private int crystalComboTicks;
+   private int crystalComboTargetId = -1;
+   private class_2338 crystalComboBase;
    private boolean driving;
    private boolean wasForward;
    private boolean wasSprint;
@@ -73,6 +82,7 @@ public class AutoPvp extends Module {
    @Override
    protected void onDisable() {
       this.clearDoubleTap();
+      this.resetCrystalCombo();
       this.cancelSlam(true);
       this.releaseShieldAxe();
       this.release();
@@ -123,7 +133,7 @@ public class AutoPvp extends Module {
       }
    }
 
-   private void clearDoubleTap() {
+   private void resetCrystalCombo() {\n      this.crystalComboPhase = 0;\n      this.crystalComboTicks = 0;\n      this.crystalComboTargetId = -1;\n      this.crystalComboBase = null;\n   }\n\n   private void clearDoubleTap() {
       this.dtapPending = false;
       this.dtapTargetId = -1;
       this.dtapTicks = 0;
@@ -334,6 +344,84 @@ public class AutoPvp extends Module {
       }
    }
 
+   private boolean tickCrystalCombo(class_746 p, class_1657 target) {
+      if (!this.crystalCombo.get()) {
+         this.resetCrystalCombo();
+         return false;
+      }
+      if (this.crystalComboPhase == 0) return false;
+      if (target == null || !target.method_5805() || target.method_5628() != this.crystalComboTargetId || this.crystalComboTicks++ > 80) {
+         this.resetCrystalCombo();
+         return false;
+      }
+
+      class_1268 main = class_1268.field_5808;
+      if (this.crystalComboPhase == 1) {
+         if (this.crystalComboBase == null) {
+            class_2338 feet = target.method_24515();
+            double dx = target.method_23317() - p.method_23317();
+            double dz = target.method_23321() - p.method_23321();
+            int ox = Math.abs(dx) > Math.abs(dz) ? 0 : (dx >= 0.0 ? 2 : -2);
+            int oz = Math.abs(dx) > Math.abs(dz) ? (dz >= 0.0 ? -2 : 2) : 0;
+            this.crystalComboBase = feet.method_10069(ox, -1, oz);
+         }
+         class_2680 baseState = mc.field_1687.method_8320(this.crystalComboBase);
+         if (!baseState.method_27852(net.minecraft.class_2246.field_9987)) {
+            int obsidian = InvUtil.ensureHotbar(class_1802.field_8281);
+            if (obsidian < 0 || !baseState.method_45474()) {
+               this.resetCrystalCombo();
+               return false;
+            }
+            class_2338 support = this.crystalComboBase.method_10074();
+            if (mc.field_1687.method_8320(support).method_26220(mc.field_1687, support).method_1110()) {
+               this.resetCrystalCombo();
+               return false;
+            }
+            InvUtil.select(obsidian);
+            class_243 hit = class_243.method_24953(support).method_1031(0.5, 1.0, 0.5);
+            mc.field_1761.method_2896(p, main, new class_3965(hit, class_2350.field_11036, support, false));
+            p.method_6104(main);
+            return true;
+         }
+         this.crystalComboPhase = 2;
+         this.crystalComboTicks = 0;
+      }
+
+      if (this.crystalComboPhase == 2 || this.crystalComboPhase == 4) {
+         boolean existing = false;
+         for (class_1297 entity : mc.field_1687.method_18112()) {
+            if (entity instanceof class_1511 crystal && crystal.method_5805()
+               && crystal.method_19538().method_1022(new class_243(this.crystalComboBase.method_10263() + 0.5,
+                  this.crystalComboBase.method_10264() + 1.0, this.crystalComboBase.method_10260() + 0.5)) < 1.5) {
+               existing = true;
+               mc.field_1761.method_2918(p, crystal);
+               p.method_6104(main);
+               this.crystalComboPhase++;
+               this.crystalComboTicks = 0;
+               return true;
+            }
+         }
+         if (!existing) {
+            int crystalSlot = InvUtil.ensureHotbar(class_1802.field_8301);
+            if (crystalSlot < 0) {
+               this.resetCrystalCombo();
+               return false;
+            }
+            InvUtil.select(crystalSlot);
+            class_243 hit = new class_243(this.crystalComboBase.method_10263() + 0.5,
+               this.crystalComboBase.method_10264() + 1.0, this.crystalComboBase.method_10260() + 0.5);
+            mc.field_1761.method_2896(p, main, new class_3965(hit, class_2350.field_11036, this.crystalComboBase, false));
+            p.method_6104(main);
+            return true;
+         }
+      }
+      if (this.crystalComboPhase >= 5) {
+         this.resetCrystalCombo();
+         return false;
+      }
+      return true;
+   }
+
    @Override
    public void onWorldLeave() {
       this.clearDoubleTap();
@@ -373,6 +461,7 @@ public class AutoPvp extends Module {
 
             this.aimAt(target.method_23317(), target.method_23323(0.5), target.method_23321());
             double distance = p.method_5739(target);
+            if (this.tickCrystalCombo(p, target)) { this.driving = true; return; }
             if (this.tickStunSlam(p, target, distance)) {
                this.driving = true;
             } else {
@@ -406,9 +495,7 @@ public class AutoPvp extends Module {
                      InvUtil.select(swordSlot);
                   }
 
-                  mc.field_1761.method_2918(p, target);
-                  p.method_6104(class_1268.field_5808);
-                  if (this.doubleTap.get()) {
+                  if (this.crystalCombo.get()) {\n                     mc.field_1690.field_1867.method_23481(true);\n                     mc.field_1690.field_1894.method_23481(true);\n                  }\n                  mc.field_1761.method_2918(p, target);\n                  p.method_6104(class_1268.field_5808);\n                  if (this.crystalCombo.get() && InvUtil.findInventory(class_1802.field_8281) >= 0 && InvUtil.findInventory(class_1802.field_8301) >= 0) {\n                     this.crystalComboPhase = 1;\n                     this.crystalComboTicks = 0;\n                     this.crystalComboTargetId = target.method_5628();\n                     this.crystalComboBase = null;\n                  }\n                  if (this.doubleTap.get()) {
                      if (this.dtapPending) {
                         this.clearDoubleTap();
                      } else {
