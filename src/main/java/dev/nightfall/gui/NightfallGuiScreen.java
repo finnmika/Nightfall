@@ -49,6 +49,7 @@ public final class NightfallGuiScreen extends class_437 {
    private int sliderW;
    private int scroll;
    private long tabChangedAt = System.nanoTime();
+   private long guiOpenedAt = System.nanoTime();
    private int ninoSecretClicks;
    private long lastNinoSecretClick;
    private boolean ninoSecretUnlocked;
@@ -324,7 +325,7 @@ public final class NightfallGuiScreen extends class_437 {
       if (this.field_22789 >= 0) {
          float duration = Math.max(50, Config.guiAnimationDuration) / Math.max(0.1F, Config.guiAnimationSpeed);
          float progress = Config.guiAnimations
-            ? Math.max(0.0F, Math.min(1.0F, (float)(System.nanoTime() - this.tabChangedAt) / 1000000.0F / duration))
+            ? Math.max(0.0F, Math.min(1.0F, (float)(System.nanoTime() - this.guiOpenedAt) / 1000000.0F / duration))
             : 1.0F;
          if (Config.guiAnimations) {
             progress = switch (Config.guiEasing) {
@@ -499,7 +500,7 @@ public final class NightfallGuiScreen extends class_437 {
          }
       }
 
-      this.drawWindow(ctx, this.activeTab, x + offsetX, yx + offsetY, w, mx, my, click, rightClick, mc);
+      this.drawAnimatedWindow(ctx, this.activeTab, x + offsetX, yx + offsetY, w, mx, my, click, rightClick, mc, true);
       if (this.numberSlider != null) {
          float amount = Math.max(0.0F, Math.min(1.0F, (float)(mx - this.numberSliderX) / Math.max(1, this.numberSliderW)));
          this.numberSlider.set(this.numberSlider.min + amount * (this.numberSlider.max - this.numberSlider.min));
@@ -608,9 +609,13 @@ public final class NightfallGuiScreen extends class_437 {
          this.scroll = 0;
          click = false;
       }
-      ctx.method_25294(0, 0, sw, sh, -1459091184);
-      int shade = Math.max(0, Math.min(150, Config.blurStrength));
-      ctx.method_25294(0, 0, sw, sh, shade << 24 | 526095);
+      int transparency = Math.max(0, Math.min(100, Config.guiTransparency));
+      int overlayAlpha = Math.round(169.0F * (100 - transparency) / 100.0F);
+      ctx.method_25294(0, 0, sw, sh, overlayAlpha << 24 | 0x080910);
+      int shade = transparency >= 100 ? 0 : Math.max(0, Math.min(150, Config.blurStrength));
+      if (shade > 0) {
+         ctx.method_25294(0, 0, sw, sh, shade << 24 | 526095);
+      }
       this.panel(ctx, 10 + edge, 9 + edge, side - 8, headerH);
       ctx.method_51433(mc.field_1772, "◒", 24 + edge, 27 + edge, Theme.ACCENT, true);
       ctx.method_51433(mc.field_1772, "NIGHTFALL", 48 + edge, 23 + edge, Theme.TEXT, true);
@@ -651,7 +656,7 @@ public final class NightfallGuiScreen extends class_437 {
       ctx.method_51433(mc.field_1772, "Premium", 49 + edge, profileY + 25, Theme.ACCENT, false);
 
       if (this.activeTab.equals("Config")) {
-         this.drawWindow(ctx, "Config", x1, topY, Math.max(260, sw - x1 - 18), mx, my, click, rightClick, mc);
+         this.drawAnimatedWindow(ctx, "Config", x1, topY, Math.max(260, sw - x1 - 18), mx, my, click, rightClick, mc, true);
       } else {
          String[] visibleTabs = {"Combat", "Visuals", "Player", "HUD"};
          int[] xs = {x1, x2, x1, x2};
@@ -659,7 +664,7 @@ public final class NightfallGuiScreen extends class_437 {
          for (int i = 0; i < visibleTabs.length; i++) {
             String tab = visibleTabs[i];
             if (this.opened(tab)) {
-               this.drawWindow(ctx, tab, xs[i], ys[i], panelW, mx, my, click, rightClick, mc);
+               this.drawAnimatedWindow(ctx, tab, xs[i], ys[i], panelW, mx, my, click, rightClick, mc, tab.equals(this.activeTab));
             }
          }
       }
@@ -703,9 +708,13 @@ public final class NightfallGuiScreen extends class_437 {
       int sh = this.field_22790;
       int side = Math.max(82, Math.min(126, Math.round(sw / 4.0F * scale)));
       int headerH = 46;
-      ctx.method_25294(0, 0, sw, sh, -1459091184);
-      int shade = Math.max(0, Math.min(150, Config.blurStrength));
-      ctx.method_25294(0, 0, sw, sh, shade << 24 | 526095);
+      int transparency = Math.max(0, Math.min(100, Config.guiTransparency));
+      int overlayAlpha = Math.round(169.0F * (100 - transparency) / 100.0F);
+      ctx.method_25294(0, 0, sw, sh, overlayAlpha << 24 | 0x080910);
+      int shade = transparency >= 100 ? 0 : Math.max(0, Math.min(150, Config.blurStrength));
+      if (shade > 0) {
+         ctx.method_25294(0, 0, sw, sh, shade << 24 | 526095);
+      }
       this.panel(ctx, 8 + edge, 8 + edge, sw - 16 - edge * 2, headerH);
       ctx.method_51433(mc.field_1772, "◒", 17 + edge, 19 + edge, Theme.ACCENT, true);
       ctx.method_51433(mc.field_1772, "NIGHTFALL", 37 + edge, 17 + edge, Theme.TEXT, true);
@@ -745,7 +754,7 @@ public final class NightfallGuiScreen extends class_437 {
       int panelX = side + 8 + edge;
       int panelY = headerH + 10 + edge;
       int panelW = Math.max(150, sw - panelX - 8 - edge);
-      this.drawWindow(ctx, this.activeTab, panelX, panelY, panelW, mx, my, click, rightClick, mc);
+      this.drawAnimatedWindow(ctx, this.activeTab, panelX, panelY, panelW, mx, my, click, rightClick, mc, true);
 
       if (this.numberSlider != null) {
          float amount = Math.max(0.0F, Math.min(1.0F, (float)(mx - this.numberSliderX) / Math.max(1, this.numberSliderW)));
@@ -758,6 +767,51 @@ public final class NightfallGuiScreen extends class_437 {
          this.drawFeedback(ctx);
       }
       this.updateConfigSlider(mx, left, release);
+   }
+
+   private void drawAnimatedWindow(class_332 ctx, String tab, int x, int y, int w, int mx, int my, boolean click, boolean rightClick, class_310 mc, boolean animate) {
+      if (!animate || !Config.guiAnimations) {
+         this.drawWindow(ctx, tab, x, y, w, mx, my, click, rightClick, mc);
+         return;
+      }
+      float duration = Math.max(50, Config.guiAnimationDuration) / Math.max(0.1F, Config.guiAnimationSpeed);
+      float progress = Math.max(0.0F, Math.min(1.0F, (float)(System.nanoTime() - this.tabChangedAt) / 1000000.0F / duration));
+      progress = switch (Config.guiEasing) {
+         case "Linear" -> progress;
+         case "Sine" -> (float)(1.0 - Math.cos(progress * Math.PI * 0.5));
+         default -> 1.0F - (float)Math.pow(1.0F - progress, 3.0);
+      };
+      float offsetX = 0.0F;
+      float offsetY = 0.0F;
+      float scale = 1.0F;
+      if (Config.guiAnimationType.equals("Slide")) {
+         float distance = 24.0F * (1.0F - progress);
+         switch (Config.guiAnimationDirection) {
+            case "Right" -> offsetX = distance;
+            case "Up" -> offsetY = -distance;
+            case "Down" -> offsetY = distance;
+            default -> offsetX = -distance;
+         }
+      } else if (Config.guiAnimationType.equals("Scale")) {
+         scale = 0.92F + 0.08F * progress;
+      } else if (Config.guiAnimationType.equals("Zoom")) {
+         scale = 0.78F + 0.22F * progress;
+      } else if (Config.guiAnimationType.equals("Fade")) {
+         scale = 0.985F + 0.015F * progress;
+      }
+      var matrices = ctx.method_51448();
+      matrices.pushMatrix();
+      if (scale != 1.0F) {
+         float cx = x + w / 2.0F;
+         float cy = y + 90.0F;
+         matrices.translate(cx + offsetX, cy + offsetY);
+         matrices.scale(scale, scale);
+         matrices.translate(-cx, -cy);
+      } else if (offsetX != 0.0F || offsetY != 0.0F) {
+         matrices.translate(offsetX, offsetY);
+      }
+      this.drawWindow(ctx, tab, x, y, w, mx, my, click && progress >= 1.0F, rightClick && progress >= 1.0F, mc);
+      matrices.popMatrix();
    }
 
    private void drawWindow(class_332 ctx, String tab, int x, int y, int w, int mx, int my, boolean click, boolean rightClick, class_310 mc) {
@@ -1119,11 +1173,11 @@ public final class NightfallGuiScreen extends class_437 {
          Theme.ACCENT,
          false
       );
-      this.drawConfigSlider(ctx, mc, "Transparenz", Config.guiTransparency + "%", "transparency", x + 10, y + 248, w - 20, Config.guiTransparency / 100.0F);
-      this.drawConfigSlider(ctx, mc, "Randgröße", Config.borderSize + " px", "border", x + 10, y + 300, w - 20, (Config.borderSize - 1) / 5.0F);
-      this.drawConfigSlider(ctx, mc, "Rundungen", Config.cornerRadius + " px", "radius", x + 10, y + 338, w - 20, (Config.cornerRadius - 10) / 22.0F);
-      this.drawConfigSlider(ctx, mc, "Menügröße", Config.guiScalePercent + "%", "scale", x + 10, y + 376, w - 20, (Config.guiScalePercent - 70) / 30.0F);
-      this.drawConfigSlider(ctx, mc, "Randabstand", Config.guiEdgeMargin + " px", "margin", x + 10, y + 414, w - 20, Config.guiEdgeMargin / 60.0F);
+      this.drawConfigSlider(ctx, mc, "Transparenz", Config.guiTransparency + "%", "transparency", x + 10, y + 270, w - 20, Config.guiTransparency / 100.0F);
+      this.drawConfigSlider(ctx, mc, "Randgröße", Config.borderSize + " px", "border", x + 10, y + 322, w - 20, (Config.borderSize - 1) / 5.0F);
+      this.drawConfigSlider(ctx, mc, "Rundungen", Config.cornerRadius + " px", "radius", x + 10, y + 360, w - 20, (Config.cornerRadius - 10) / 22.0F);
+      this.drawConfigSlider(ctx, mc, "Menügröße", Config.guiScalePercent + "%", "scale", x + 10, y + 398, w - 20, (Config.guiScalePercent - 70) / 30.0F);
+      this.drawConfigSlider(ctx, mc, "Randabstand", Config.guiEdgeMargin + " px", "margin", x + 10, y + 436, w - 20, Config.guiEdgeMargin / 60.0F);
       if (click && inside(mx, my, x + 10, y + 202, w - 20, 12)) {
          this.slider = "hue";
          this.sliderX = x + 10;
@@ -1163,11 +1217,11 @@ public final class NightfallGuiScreen extends class_437 {
          Config.guiAnimationSpeed = Config.guiAnimationSpeed >= 5.0F ? 0.1F : Math.min(5.0F, Config.guiAnimationSpeed + 0.1F);
       }
 
-      this.beginConfigSlider(click, mx, my, x + 10, y + 262, w - 20, "transparency");
-      this.beginConfigSlider(click, mx, my, x + 10, y + 314, w - 20, "border");
-      this.beginConfigSlider(click, mx, my, x + 10, y + 352, w - 20, "radius");
-      this.beginConfigSlider(click, mx, my, x + 10, y + 390, w - 20, "scale");
-      this.beginConfigSlider(click, mx, my, x + 10, y + 428, w - 20, "margin");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 284, w - 20, "transparency");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 336, w - 20, "border");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 374, w - 20, "radius");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 412, w - 20, "scale");
+      this.beginConfigSlider(click, mx, my, x + 10, y + 450, w - 20, "margin");
       if (click) {
          Config.save();
       }
