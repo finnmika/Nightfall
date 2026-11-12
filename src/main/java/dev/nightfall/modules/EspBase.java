@@ -20,7 +20,7 @@ public abstract class EspBase extends Module {
    protected final NumberSetting maxObjects = this.add(new NumberSetting("Max Objekte", 512.0, 4.0, 512.0, 4.0));
    protected final NumberSetting thickness = this.add(new NumberSetting("Linienstaerke", 4.0, 1.0, 4.0, 1.0));
    protected final NumberSetting opacity = this.add(new NumberSetting("Transparenz", 1.0, 0.2, 1.0, 0.05));
-   protected final BoolSetting smoothing = this.add(new BoolSetting("Linien-Antialiasing", true));
+   protected final BoolSetting smoothing = this.add(new BoolSetting("Linien-Antialiasing", false));
    protected final BoolSetting distanceFade = this.add(new BoolSetting("Distanz-Fade", false));
    protected final NumberSetting fadeStart = this.add(new NumberSetting("Fade ab (Anteil)", 0.9, 0.1, 0.9, 0.05));
    protected final ModeSetting style = this.add(new ModeSetting("Box", "3D", "3D", "2D", "Aus"));
