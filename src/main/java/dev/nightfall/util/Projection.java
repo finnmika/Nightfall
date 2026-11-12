@@ -91,23 +91,6 @@ public final class Projection {
       }
    }
 
-   /**
-    * Returns the entity's world-space bounding box at the exact HUD render tick.
-    * Entity#getBoundingBox() is tick-position based, so translate it by the
-    * difference between the interpolated render position and current tick position.
-    */
-   public static class_238 interpolatedBoundingBox(class_1297 entity) {
-      if (entity == null) {
-         return null;
-      }
-      class_243 rendered = entity.method_30950(tickDelta);
-      return entity.method_5829().method_989(
-         rendered.field_1352 - entity.method_23317(),
-         rendered.field_1351 - entity.method_23318(),
-         rendered.field_1350 - entity.method_23321()
-      );
-   }
-
    public static boolean canSeeFromCamera(class_310 mc, class_1297 target) {
       if (mc != null && mc.field_1687 != null && mc.field_1724 != null && target != null) {
          class_4184 camera = mc.field_1773.method_19418();
